@@ -48,3 +48,8 @@ export interface GymList {
     data:gymListData[]
   }
   
+export interface trainer {
+    success:string,
+    data:gymListData[]
+  }
+  

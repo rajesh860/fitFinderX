@@ -17,7 +17,7 @@ export const dynamicBaseQuery = async (
   const rawBaseQuery = fetchBaseQuery({
     // baseUrl: 'http://10.252.84.250:3001',
     baseUrl: 'http://13.60.166.240/api',
-    // baseUrl: 'https://c326800976ae.ngrok-free.app',
+    // baseUrl: 'https://464901a93f7a.ngrok-free.app',
     prepareHeaders: (headers) => {
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);

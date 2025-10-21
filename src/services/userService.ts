@@ -164,6 +164,13 @@ export const userApi = createApi({
         body
       }),
     }),
+    demoLogin: builder.mutation<any, void>({
+      query: (body) => ({
+        url: `/auth/demo-login`,
+        method: "POST",
+        body
+      }),
+    }),
 
   }),
 });
@@ -189,5 +196,6 @@ export const {
   useOtpResendMutation,
   useForgotPasswordMutation,
   useOtpVerifyMutation,
-  useResetPawwordMutation
+  useResetPawwordMutation,
+  useDemoLoginMutation
 } = userApi;
