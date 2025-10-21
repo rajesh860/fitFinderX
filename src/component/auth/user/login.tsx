@@ -5,20 +5,22 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useUserLoginMutation } from "../../../services/userService";
+import { useDemoLoginMutation, useUserLoginMutation } from "../../../services/userService";
 import { COLORS } from "../../../theme/colors";
 
 const handleGoogleSignIn = () => console.log("Google Sign-In/Register");
 const handleFacebookSignIn = () => console.log("Facebook Sign-In/Register");
-const handleGuestLogin = () => console.log("Continue as Guest");
 
 const UserLogin = () => {
-  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigation = useNavigation();
 
   const [trigger, { data, isLoading }] = useUserLoginMutation();
+  const [triggerDemoLogin, { data: demoData }] = useDemoLoginMutation();
+  console.log(demoData, "DemoData");
+
 
   const handleLogin = async () => {
     try {
@@ -31,27 +33,41 @@ const UserLogin = () => {
       console.log("Error retrieving baseURL:", error);
     }
   };
-
+  
   useEffect(() => {
-    if (data?.success) {
+    const successData = data?.success ? data : demoData?.success ? demoData : null;
+
+    if (successData) {
       const storeTokenAndNavigate = async () => {
         try {
-          await AsyncStorage.setItem("token", data.token);
-          await AsyncStorage.setItem("userId", data?.user?.userId);
+          const token = successData?.token || "";
+          const userRole = successData?.user?.userRole || "";
+          const userId = successData?.user?.userId?.toString() || "";
+
+          if (token) await AsyncStorage.setItem("token", token);
+          if (userRole) await AsyncStorage.setItem("userRole", userRole);
+          if (userId) await AsyncStorage.setItem("userId", userId);
+
           Toast.show({
             type: "success",
-            text1: data.message,
+            text1: successData?.message || "Login successful!",
             text2: "Welcome back! 🎉",
             position: "top",
           });
+
           navigation.navigate("MainTabs", { screen: "Home" });
         } catch (error) {
           console.log("Error storing token:", error);
         }
       };
+
       storeTokenAndNavigate();
     }
-  }, [data, navigation]);
+  }, [data, demoData, navigation]);
+
+
+
+  const handleGuestLogin = () => triggerDemoLogin();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

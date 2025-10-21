@@ -185,8 +185,6 @@ useEffect(() => {
   };
 
 
-  console.log(userData, "UserDATA");
-
   if (!userData) {
     return (
       <Modal transparent animationType="fade" visible={!userData}>
