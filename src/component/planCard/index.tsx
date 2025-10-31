@@ -4,141 +4,188 @@ import { Card, Text, Chip } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface PlanCardProps {
-    plan: any;
+  plan: any;
+  active:string
 }
 
-const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
-    // Map feature names to icons (for your existing UI)
-    const featureIconMap: { [key: string]: string } = {
-        "Wi-Fi": "wifi",
-        "24/7 Access": "clock",
-        "Yoga Classes": "yoga",
-        "Free Weights": "weight-lifter",
-        "Weight Training": "dumbbell",
-        "Cardio Machines": "run",
-    };
+const PlanCard: React.FC<PlanCardProps> = ({ plan ,active}) => {
+  return (
+    <Card style={styles.card}>
+      {/* Header: Plan Name + Status */}
+      <View style={styles.headerRow}>
+        <Text style={styles.planName}>{plan.planName}</Text>
+        {active &&
+        <Text
+        style={[
+          styles.statusChip,
+          active === "Active" ? styles.active : styles.inactive,
+        ]}
+        //   textStyle={styles.statusText}
+        >
+          {active?.toUpperCase() || "INACTIVE"}
+        </Text>
+    }
+      </View>
 
-    return (
-        <Card style={styles.card}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Icon name="dumbbell" size={28} color="#fff" />
-                <Text style={styles.title}>{plan.planName}</Text>
-                <Chip style={styles.mostPopular} textStyle={{ color: "#fff" }}>
-                    Most Popular
-                </Chip>
-            </View>
+      {/* Gym Name & Rating */}
+      <View style={styles.gymRow}>
+        <Icon name="dumbbell" size={16} color="#4dd0e1" />
+        <Text style={styles.gymName}>{plan.gym?.name || "Gym Name"}</Text>
+        {/* {plan.gym?.avgRating !== undefined && (
+          <View style={styles.rating}>
+            <Icon name="star" size={16} color="#FFD700" />
+            <Text style={styles.ratingText}>
+              {plan.gym.avgRating.toFixed(1)} ({plan.gym.totalReviews || 0})
+            </Text>
+          </View>
+        )} */}
+      </View>
 
-            {/* Price Section */}
-            <View style={styles.priceBox}>
-                <Text style={styles.price}>₹{plan.price}</Text>
-                <Text style={styles.perMonth}>/month</Text>
-            </View>
-            <Chip style={styles.duration} textStyle={{ color: "#fff" }}>
-                {plan.durationInMonths} Month{plan.durationInMonths > 1 ? "s" : ""} Duration
-            </Chip>
+      {/* Price & Duration Row */}
+      <View style={styles.rowBetweenInfo}>
+        <View style={styles.infoItem}>
+          <View style={styles.iconBox}>
+            <Icon name="pricetag" size={24} color="#ff914d" />
+          </View>
+          <View style={styles.infoTextBox}>
+            <Text style={styles.infoLabel}>Price</Text>
+            <Text style={styles.infoValue}>₹{plan.price}</Text>
+          </View>
+        </View>
 
-            {/* What's Included */}
-            <View style={styles.included}>
-                <Text style={styles.sectionTitle}>What's Included</Text>
-                {plan.features.map((feature: string, index: number) => (
-                    <View style={styles.item} key={index}>
-                        <Icon name={featureIconMap[feature] || "check"} size={20} color="#4ade80" />
-                        <Text style={styles.itemText}>{feature}</Text>
+        <View style={styles.infoItem}>
+          <View style={styles.iconBox}>
+            <Icon name="calendar" size={24} color="#ff914d" />
+          </View>
+          <View style={styles.infoTextBox}>
+            <Text style={styles.infoLabel}>Duration</Text>
+            <Text style={styles.infoValue}>
+              {plan.durationInMonths} {plan.durationInMonths > 1 ? "Months" : "Month"}
+            </Text>
+          </View>
+        </View>
+      </View>
 
-                        {/* Optional chips for popular/premium */}
-                        {feature === "Wi-Fi" && (
-                            <Chip compact style={styles.premiumChip}>Premium</Chip>
-                        )}
-                        {feature === "24/7 Access" && (
-                            <Chip compact style={styles.popularChip}>Popular</Chip>
-                        )}
-
-                        <Icon name="check" size={20} color="#4ade80" />
-                    </View>
-                ))}
-            </View>
-        </Card>
-    );
+      {/* What's Included */}
+      <View style={styles.features}>
+        <Text style={styles.sectionTitle}>What's Included</Text>
+        {plan.features.map((feature: string, index: number) => (
+          <View key={index} style={styles.featureItem}>
+            <Icon name="check-circle" size={20} color="#4ade80" />
+            <Text style={styles.featureText}>{feature}</Text>
+          </View>
+        ))}
+      </View>
+    </Card>
+  );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        flex: 1,
-        borderRadius: 20,
-        backgroundColor: "#1e293b",
-        width: "100%",
-        alignSelf: "center",
-        paddingBottom: 16,
-    },
-    header: {
-        backgroundColor: "#7c3aed",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 16,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#fff",
-        marginTop: 4,
-    },
-    mostPopular: {
-        backgroundColor: "#6d28d9",
-        marginTop: 6,
-    },
-    priceBox: {
-        flexDirection: "row",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        marginTop: 16,
-    },
-    price: {
-        fontSize: 28,
-        fontWeight: "bold",
-        color: "#fff",
-    },
-    perMonth: {
-        fontSize: 16,
-        color: "#cbd5e1",
-        marginLeft: 4,
-    },
-    duration: {
-        backgroundColor: "#064e3b",
-        alignSelf: "center",
-        marginVertical: 8,
-    },
-    included: {
-        paddingHorizontal: 16,
-        marginTop: 8,
-        flexGrow: 1,
-    },
-    sectionTitle: {
-        fontSize: 16,
-        color: "#fff",
-        fontWeight: "600",
-        marginBottom: 10,
-    },
-    item: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 12,
-    },
-    itemText: {
-        flex: 1,
-        color: "#fff",
-        marginLeft: 8,
-    },
-    premiumChip: {
-        backgroundColor: "#facc15",
-        marginRight: 8,
-    },
-    popularChip: {
-        backgroundColor: "#3b82f6",
-        marginRight: 8,
-    },
+  card: {
+    borderRadius: 20,
+    backgroundColor: "#1e293b",
+    width: "100%",
+    alignSelf: "center",
+    marginBottom: 20,
+    overflow: "hidden",
+    paddingBottom: 16,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+  },
+  planName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  statusChip: {
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+
+  },
+  statusText: {
+    color: "#fff",
+    fontWeight: "700",
+    // textAlign: "center",
+    fontSize: 10,
+  },
+  active: { backgroundColor: "#4caf50" },
+  inactive: { backgroundColor: "#f57c00" },
+  gymRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  gymName: {
+    color: "#fff",
+    fontSize: 14,
+    marginLeft: 6,
+  },
+  rating: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+  ratingText: { color: "#fff", marginLeft: 4, fontSize: 13 },
+  rowBetweenInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,145,77,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  infoTextBox: {
+    marginLeft: 0,
+  },
+  infoLabel: {
+    color: "#9fb2b6",
+    fontSize: 12,
+  },
+  infoValue: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  features: {
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  featureText: {
+    color: "#fff",
+    marginLeft: 8,
+    fontSize: 14,
+  },
 });
 
 export default PlanCard;

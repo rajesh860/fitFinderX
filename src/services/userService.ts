@@ -171,11 +171,31 @@ export const userApi = createApi({
         body
       }),
     }),
+    userDashboard: builder.query<any, void>({
+      query: () => ({
+        url: `/user/dashboard`,
+        method: "GET",
+      }),
+    }),
+    planDetail: builder.query<any, any>({
+      query: (gymPlanId) => ({
+        url: `/user/plain-detail/${gymPlanId}`,
+        method: "GET",
+      }),
+    }),
+    // getPlanHistory: builder.query<any, any>({
+    //   query: (gymPlanId) => ({
+    //     url: `/user/plain-detail/${gymPlanId}`,
+    //     method: "GET",
+    //   }),
+    // }),
 
   }),
 });
 
 export const {
+  usePlanDetailQuery,
+  useUserDashboardQuery,
   useGetPlanHistoryQuery,
   useGymUserProgressQuery,
   useGetUserDetailQuery,

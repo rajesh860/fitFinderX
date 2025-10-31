@@ -8,9 +8,10 @@ interface ExpertiseSectionProps {
         yearsExperience: number;
         clientsTrained: number;
     };
+    user:any
 }
 
-const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({ trainer }) => {
+const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({ trainer,user }) => {
     return (
         <Card style={styles.card}>
             <Card.Content>
@@ -19,7 +20,7 @@ const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({ trainer }) => {
                 {/* Metrics Section */}
                 <View style={styles.metricsRow}>
                     <View style={styles.metricCol}>
-                        <Text style={styles.metricValue}>{trainer.yearsExperience}+</Text>
+                        <Text style={styles.metricValue}>{user?.experience}</Text>
                         <Text style={styles.metricLabel}>Years Experience</Text>
                     </View>
 
@@ -34,7 +35,7 @@ const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({ trainer }) => {
 
                 {/* Expertise Chips */}
                 <View style={styles.expertiseChips}>
-                    {trainer.expertise.map((e) => (
+                    {user?.specialization?.map((e) => (
                         <Chip
                             key={e}
                             style={styles.expertiseChip}

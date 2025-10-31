@@ -1,37 +1,35 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Avatar, Button, Surface, Text } from "react-native-paper";
+import {  Button, Surface, Text } from "react-native-paper";
+import { Image } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface HeaderSectionProps {
     trainer: any;
-    isFollowing: boolean;
-    handleFollow: () => void;
-    handleMessage: () => void;
+    handleCall: () => any;
+    handleBook: () => void;
+    user:any;
 }
 
 const HeaderSection: React.FC<HeaderSectionProps> = ({
     trainer,
-    isFollowing,
-    handleFollow,
-    handleMessage,
+    handleCall,
+    handleBook,
+    user,
 }) => {
     return (
         <Surface style={styles.headerSurface}>
             <View style={styles.headerTop}>
-                <Avatar.Image
-                    size={72}
-                    source={{ uri: "https://placehold.co/150x150?text=Avatar" }}
-                />
+               <Image source={{ uri: user?.photo }} style={styles.profile} />
                 <View style={{ marginLeft: 12, flex: 1 }}>
-                    <Text style={styles.name}>{trainer.name}</Text>
+                    <Text style={styles.name}>{user?.user?.name}</Text>
                     <Text style={styles.title}>{trainer.title}</Text>
 
                     <View style={styles.ratingRow}>
                         <MaterialCommunityIcons name="star" size={16} color="#FFD54A" />
-                        <Text style={styles.ratingText}>{trainer.rating}</Text>
+                        <Text style={styles.ratingText}>{user?.averageRating}</Text>
                         <Text style={styles.reviewsText}>
-                            ({trainer.reviews} reviews)
+                            ({user?.totalReviews} reviews)
                         </Text>
                     </View>
                 </View>
@@ -40,14 +38,14 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
             {/* Buttons moved to the bottom */}
             <View style={styles.headerButtons}>
                 <Button
-                    mode={isFollowing ? "outlined" : "contained"}
-                    onPress={handleFollow}
+                    mode={"contained"}
+                    onPress={()=>handleCall(user?.user?.phone)}
                     style={styles.followBtn}
                 >
-                    {isFollowing ? "Following" : "Follow"}
+                    Call
                 </Button>
-                <Button mode="outlined" onPress={handleMessage} style={styles.msgBtn}>
-                    Message
+                <Button mode="outlined" onPress={handleBook} style={styles.msgBtn}>
+                    Hire Trainer
                 </Button>
             </View>
         </Surface>
@@ -62,6 +60,11 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
+    },
+    profile:{
+    width: 64,
+        height: 64,
+        borderRadius: 32,
     },
     headerTop: {
         flexDirection: "row",

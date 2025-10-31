@@ -33,6 +33,7 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { COLORS } from "../theme/colors";
+import { useSelector } from "react-redux";
 
 // Navigation prop type
 export type ProfileScreenProp = NativeStackNavigationProp<RootStackParamList, 'ProfileScreen'>;
@@ -45,9 +46,12 @@ export default function ProfileScreen() {
   const [injuries, setInjuries] = useState<any[]>([]);
   const [fitnessGoals, setFitnessGoals] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
+ const userRole = useSelector((state:any) => state.auth.userRole);
   const [updateProfile, { data: updateData, isLoading: updating, error: updateError }] = useUpdateProfileMutation();
-  const { data: apiData, isLoading, error, refetch } = useGetUserDetailQuery();
+  const { data: apiData, isLoading, error, refetch } = useGetUserDetailQuery(undefined,{
+  skip: !userRole,
+  refetchOnMountOrArgChange: true, // optional if you want auto-refetch on user change
+});
   const { isLoading: isUpdating } = useApiFeedback(updating, updateData, updateError);
 
   const { weight, height, bloodGroup } = apiData?.progress || {};
@@ -172,7 +176,7 @@ useEffect(() => {
             await updateProfile({
               body: formData,
               userId: userData?._id,
-            }).unwrap();
+            }as any).unwrap();
 
             await refetch();
           } catch (err: any) {

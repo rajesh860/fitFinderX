@@ -14,7 +14,7 @@ import Toast from "react-native-toast-message";
 import { COLORS } from "../../theme/colors";
 
 
-const GymDetailsHeader = ({ navigation, title, like, onLogout }: any) => {
+const GymDetailsHeader = ({ navigation, title, like, onLogout,backArrow=true }: any) => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -32,7 +32,7 @@ await AsyncStorage.clear()
         position: "bottom",
         visibilityTime: 2000,
       });
-
+await AsyncStorage.clear()
       // Navigate to login screen
       navigation.replace("AuthScreen");
     } catch (error) {
@@ -55,9 +55,11 @@ await AsyncStorage.clear()
     <View style={styles.headerContainer}>
       <View style={styles.header}>
         {/* Back Button */}
+        {backArrow&&  
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
           <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
         </TouchableOpacity>
+        }
 
         {/* Title */}
         <Text style={styles.title}>{title}</Text>
@@ -69,7 +71,7 @@ await AsyncStorage.clear()
             onPress={() => console.log("Added to wishlist")}
             style={[styles.iconBtn, { opacity: like ? 1 : 0 }]}
           >
-            <Ionicons name="heart-outline" size={20} color="#111" />
+            <Ionicons name="heart-outline" size={20} color="#fff" />
           </TouchableOpacity>
 
           {/* Logout Icon */}
@@ -145,6 +147,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: COLORS.textPrimary,
+    paddingLeft:10
   },
   modalOverlay: {
     flex: 1,

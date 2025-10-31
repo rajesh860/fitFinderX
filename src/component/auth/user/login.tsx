@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useDemoLoginMutation, useUserLoginMutation } from "../../../services/userService";
 import { COLORS } from "../../../theme/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserRole } from "../../../services/authSlice";
 
 const handleGoogleSignIn = () => console.log("Google Sign-In/Register");
 const handleFacebookSignIn = () => console.log("Facebook Sign-In/Register");
@@ -33,7 +35,7 @@ const UserLogin = () => {
       console.log("Error retrieving baseURL:", error);
     }
   };
-  
+      const dispatch = useDispatch();
   useEffect(() => {
     const successData = data?.success ? data : demoData?.success ? demoData : null;
 
@@ -45,7 +47,10 @@ const UserLogin = () => {
           const userId = successData?.user?.userId?.toString() || "";
 
           if (token) await AsyncStorage.setItem("token", token);
-          if (userRole) await AsyncStorage.setItem("userRole", userRole);
+          if (userRole){ await AsyncStorage.setItem("userRole", userRole)
+             dispatch(setUserRole(userRole));
+        
+          }
           if (userId) await AsyncStorage.setItem("userId", userId);
 
           Toast.show({
@@ -133,11 +138,11 @@ const UserLogin = () => {
         )}
       </Button>
 
-      <TouchableOpacity style={{ marginVertical: 6 }}>
+      {/* <TouchableOpacity style={{ marginVertical: 6 }}>
         <Text style={{ textAlign: "center", color: COLORS.primaryLight }}>
           Login with OTP instead
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={styles.divider}>
         <View style={styles.line} />

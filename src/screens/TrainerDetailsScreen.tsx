@@ -1,149 +1,197 @@
 import * as React from "react";
-import { View, ScrollView, Share, Linking } from "react-native";
-import { Appbar, Button, Surface } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { View, ScrollView, Share, Linking, TouchableOpacity } from "react-native";
+import { Appbar, Button, Surface, Modal, Portal, TextInput, Text } from "react-native-paper";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-// Importing components from the correct paths
 import HeaderSection from "../template/trainerDetails/HeaderSection";
 import AboutSection from "../template/trainerDetails/AboutSection";
 import ExpertiseSection from "../template/trainerDetails/ExpertiseSection";
-import AvailabilitySection from "../template/trainerDetails/AvailabilitySection";
-import SuccessStoriesSection from "../template/trainerDetails/SuccessStoriesSection";
 import ReviewsSection from "../template/trainerDetails/ReviewsSection";
 import GallerySection from "../template/trainerDetails/GallerySection";
-import { COLORS } from "../theme/colors";
 import GymDetailsHeader from "../component/appHeader";
+import { COLORS } from "../theme/colors";
+import { useAddTrainerMutation, useGetTrainerReviewQuery, useTrainerDetailQuery } from "../services/trainer";
 
 export default function TrainerDetailsScreen() {
-    const navigation = useNavigation<any>();
-    const [isFollowing, setIsFollowing] = React.useState(false);
-    const [selectedDay, setSelectedDay] = React.useState<string | null>(null);
+  const navigation = useNavigation<any>();
+  const route = useRoute();
+  const { trainerId } = route.params as { trainerId: string };
 
-    const trainer = {
-        name: "Marcus Rodriguez",
-        title: "Certified Personal Trainer",
-        rating: 4.9,
-        reviews: 127,
-        about:
-            "Passionate fitness coach with 8+ years of experience helping clients achieve their fitness goals. Specialized in strength training, weight loss, and functional fitness.",
-        badges: ["NASM Certified", "Nutrition Specialist", "CrossFit Level 2"],
-        expertise: [
-            "Weight Loss",
-            "Strength Training",
-            "HIIT",
-            "Functional Fitness",
-            "Sports Conditioning",
-        ],
-        yearsExperience: 8,
-        clientsTrained: 200,
-        availabilityNext: "Tomorrow, 6:00 AM",
-        success: {
-            sessions: "1,250+",
-            successRate: "95%",
-            transformations: "50+",
-        },
-    };
+  const [trigger, { data: addReviewResponse, isLoading }] = useAddTrainerMutation();
+  const { data: reviewData ,isLoading:reviewLoading} = useGetTrainerReviewQuery(trainerId);
+  const { data } = useTrainerDetailQuery(trainerId);
 
-    const reviews = [
-        {
-            id: "r1",
-            name: "Sarah Johnson",
-            text: "Amazing trainer! Lost 15 lbs in 2 months with Marcus's guidance. Highly recommend!",
-            time: "2 days ago",
-            rating: 5,
-        },
-        {
-            id: "r2",
-            name: "Mike Chen",
-            text: "Professional and motivating. Great workout plans tailored to my goals.",
-            time: "1 week ago",
-            rating: 5,
-        },
-    ];
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [rating, setRating] = React.useState(0);
+  const [comment, setComment] = React.useState("");
 
-    const gallery = [
-        "https://placehold.co/300x200?text=Gym+1",
-        "https://placehold.co/300x200?text=Gym+2",
-        "https://placehold.co/300x200?text=Gym+3",
-        "https://placehold.co/300x200?text=Gym+4",
-    ];
+  const trainer = {
+    name: "Marcus Rodriguez",
+    title: "Certified Personal Trainer",
+    rating: 4.9,
+    reviews: 127,
+    about:
+      "Passionate fitness coach with 8+ years of experience helping clients achieve their fitness goals. Specialized in strength training, weight loss, and functional fitness.",
+    badges: ["NASM Certified", "Nutrition Specialist", "CrossFit Level 2"],
+    expertise: [
+      "Weight Loss",
+      "Strength Training",
+      "HIIT",
+      "Functional Fitness",
+      "Sports Conditioning",
+    ],
+    yearsExperience: 8,
+    clientsTrained: 200,
+    availabilityNext: "Tomorrow, 6:00 AM",
+    success: {
+      sessions: "1,250+",
+      successRate: "95%",
+      transformations: "50+",
+    },
+  };
 
-    const handleFollow = () => setIsFollowing(!isFollowing);
 
-    const handleShare = async () => {
-        try {
-            await Share.share({
-                message: `Check out ${trainer.name}, a certified fitness trainer!`,
-            });
-        } catch (err) {
-            console.log(err);
-        }
-    };
 
-    const handleMessage = () => {
-        navigation.navigate("ChatScreen", { trainer });
-    };
+  const gallery = [
+    "https://placehold.co/300x200?text=Gym+1",
+    "https://placehold.co/300x200?text=Gym+2",
+    "https://placehold.co/300x200?text=Gym+3",
+    "https://placehold.co/300x200?text=Gym+4",
+  ];
 
-    const handleBook = () => {
-        navigation.navigate("BookingScreen", { trainer });
-    };
+  const handleBook = () => navigation.navigate("trainerBooking", { trainerId:trainerId });
 
-    const handleCall = () => {
-        Linking.openURL(`tel:9876543210`);
-    };
+  const handleCall = (phone: any) => Linking.openURL(`tel:${phone}`);
 
-    return (
-        <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-           <GymDetailsHeader title="Trainer Detail"/>
+  const handleAddReview = async () => {
+    if (!rating || !comment.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Fields",
+        text2: "Please provide both rating and review text.",
+      });
+      return;
+    }
 
-            {/* Scroll content */}
-            <ScrollView contentContainerStyle={{ padding: 7 }}>
-                <HeaderSection
-                    trainer={trainer}
-                    isFollowing={isFollowing}
-                    handleFollow={handleFollow}
-                    handleMessage={handleMessage}
-                />
-                <AboutSection trainer={trainer} />
-                <ExpertiseSection trainer={trainer} />
-                {/* <AvailabilitySection
-                    trainer={trainer}
-                    selectedDay={selectedDay}
-                    setSelectedDay={setSelectedDay}
-                    handleBook={handleBook}
-                /> */}
-                <SuccessStoriesSection trainer={trainer} />
-                <ReviewsSection reviews={reviews} />
-                <GallerySection gallery={gallery} />
-                <View style={{ height: 96 }} />
-            </ScrollView>
+    try {
+      const body = { rating, comment };
+      const res = await trigger({ body, trainerId }).unwrap();
 
-            {/* Bottom action bar */}
-            <Surface style={{ padding: 16, flexDirection: "row", justifyContent: "space-between" }}>
-                <Button
-                    icon="message"
-                    mode="outlined"
-                    onPress={handleMessage}
-                    style={{ flex: 1, marginRight: 8 }}
-                >
-                    Message
-                </Button>
-                <Button
-                    icon="phone"
-                    mode="outlined"
-                    onPress={handleCall}
-                    style={{ flex: 1, marginRight: 8 }}
-                >
-                    Call
-                </Button>
-                <Button
-                    mode="contained"
-                    onPress={handleBook}
-                    style={{ flex: 1 }}
-                >
-                    Book Session
-                </Button>
-            </Surface>
-        </View>
-    );
+      Toast.show({
+        type: "success",
+        text1: "Success 🎉",
+        text2: res?.message || "Review added successfully!",
+      });
+
+      setModalVisible(false);
+      setComment("");
+      setRating(0);
+    } catch (err: any) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: err?.data?.message || "Failed to add review.",
+      });
+    }
+  };
+
+  // ⭐ Custom Rating UI
+  const renderStars = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <TouchableOpacity key={i} onPress={() => setRating(i)}>
+          <MaterialCommunityIcons
+            name={i <= rating ? "star" : "star-outline"}
+            size={32}
+            color={i <= rating ? "#FFD700" : "#9AA6B2"}
+            style={{ marginRight: 4 }}
+          />
+        </TouchableOpacity>
+      );
+    }
+    return <View style={{ flexDirection: "row", marginVertical: 10 }}>{stars}</View>;
+  };
+console.log("Trainer Details Data:",data?.data);
+  return (
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <GymDetailsHeader title="Trainer Detail" navigation={navigation} />
+
+      <ScrollView contentContainerStyle={{ padding: 7 }}>
+        <HeaderSection
+          user={data?.data}
+          trainer={trainer}
+          handleCall={handleCall}
+          handleBook={handleBook}
+        />
+        <AboutSection user={data?.data} />
+        <ExpertiseSection trainer={trainer} user={data?.data} />
+        <ReviewsSection reviews={reviewData?.data} />
+        <GallerySection gallery={gallery} />
+        <View style={{ height: 96 }} />
+      </ScrollView>
+
+      <Surface
+        style={{
+          padding: 16,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Button
+          icon="message"
+          mode="outlined"
+          onPress={() => setModalVisible(true)}
+          style={{ flex: 1, marginRight: 8 }}
+        >
+          Add Review
+        </Button>
+      </Surface>
+
+      {/* 🔹 Review Modal */}
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          onDismiss={() => setModalVisible(false)}
+          contentContainerStyle={{
+            backgroundColor: COLORS.card,
+            padding: 20,
+            margin: 20,
+            borderRadius: 12,
+          }}
+        >
+          <Text style={{ fontSize: 18, marginBottom: 10, fontWeight: "600" }}>
+            Add Your Review
+          </Text>
+
+          {/* Custom Rating */}
+          {renderStars()}
+          <Text style={{ color: "#9AA6B2", fontSize: 13, marginBottom: 10 }}>
+            Selected Rating: {rating} ★
+          </Text>
+
+          <TextInput
+            label="Write your review"
+            value={comment}
+            onChangeText={setComment}
+            mode="outlined"
+            multiline
+            numberOfLines={4}
+            style={{ marginTop: 10, backgroundColor: "transparent" }}
+          />
+
+          <Button
+            mode="contained"
+            loading={isLoading}
+            onPress={handleAddReview}
+            style={{ marginTop: 20 }}
+          >
+            Submit Review
+          </Button>
+        </Modal>
+      </Portal>
+    </View>
+  );
 }

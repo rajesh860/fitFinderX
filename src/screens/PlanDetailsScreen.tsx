@@ -1,39 +1,45 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
-import { Button } from 'react-native-paper';
+import { ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
 import GymDetailsHeader from '../component/appHeader';
 import PlanCard from '../component/planCard';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useGymJoinMutation } from '../services/userService';
+import { usePlanDetailQuery } from '../services/userService';
+import { Text } from 'react-native-paper';
+import { COLORS } from '../theme/colors'; // Agar aap COLORS define kar rahe ho
 
 const PlanDetailsScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { plans, memberId } = route.params as { plans: any; memberId: string };
-    console.log(plans, "plan details route");
-    console.log(memberId, "memberId details route");
+    const { planId } = route.params as { planId: string };
 
+    // Fetch plan detail from API
+    const { data, isLoading, isError } = usePlanDetailQuery(planId);
+    if (isLoading) return (
+        <View style={styles.loader}>
+            <ActivityIndicator size="large" color={COLORS.primary || '#ff914d'} />
+        </View>
+    );
 
-    const [trigger, { data, isLoading, error }] = useGymJoinMutation();
+    if (isError || !data?.data) return (
+        <View style={styles.loader}>
+            <Text style={{color:'#fff'}}>Failed to load plan details.</Text>
+        </View>
+    );
 
-    const handleJoinNow = () => {
-        const payload = {
-            body: {
-                planId: plans.planId,
-            },
-            id: memberId,
-        }
-        console.log(payload, "join now payload");
-        trigger(payload);
+    const plan = {
+        planName: data.data.planName,
+        price: data.data.price,
+        durationInMonths: data.data.duration,
+        features: data.data.features,
+        gym: data.data.gym,
+        createdAt: data.data.createdAt,
     };
 
     return (
         <View style={styles.container}>
-            <GymDetailsHeader navigation={navigation} title="Gym Plan Detail" like={true} />
-
-            {/* Scrollable Content */}
+            <GymDetailsHeader navigation={navigation} title="Gym Plan Detail" like={false} />
             <ScrollView contentContainerStyle={styles.scroll}>
-                <PlanCard plan={plans} /> {/* Pass plan data to PlanCard */}
+                <PlanCard plan={plan} active={"Active"}/>
             </ScrollView>
         </View>
     );
@@ -46,7 +52,12 @@ const styles = StyleSheet.create({
     },
     scroll: {
         padding: 16,
-        paddingBottom: 100, // leave space for button
+        paddingBottom: 100,
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

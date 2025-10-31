@@ -118,9 +118,9 @@ const ProgressDetailsScreen = () => {
           <Icon name="arrow-left" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <View style={{ flex: 1, marginLeft: 12 }}>
-          <Text style={styles.headerTitle}>Progress Details</Text>
+          <Text style={styles.headerTitle}>Progress History</Text>
           <Text style={styles.headerSubtitle}>
-            {progress?.data?.gym?.gymName || 'Gym'} • Last Updates
+            {progress?.data?.gym?.gymName || 'Gym'}
           </Text>
         </View>
         <TouchableOpacity>
@@ -130,7 +130,7 @@ const ProgressDetailsScreen = () => {
 
       <ScrollView style={styles.container}>
         {/* Weight Progress Card */}
-        <Card style={styles.card}>
+        {/* <Card style={styles.card}>
           <Text style={styles.cardTitle}>Weight Progress</Text>
           <Text style={styles.cardSubtitle}>Tracking over time</Text>
           <LineChart
@@ -153,12 +153,12 @@ const ProgressDetailsScreen = () => {
             bezier
             style={{ ...styles.chart, marginLeft: -35 }}
           />
-        </Card>
+        </Card> */}
 
         {/* Measurement History Section */}
         <View style={styles.historySection}>
-          <Text style={styles.sectionTitle}>Measurement History</Text>
-          <Text style={styles.cardSubtitle}>Recent body measurements</Text>
+          {/* <Text style={styles.sectionTitle}>Measurement History</Text>
+          <Text style={styles.cardSubtitle}>Recent body measurements</Text> */}
 
           {/* Current / latest */}
           {current && (
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 16,
+    padding: 10,
   },
   headerRow: {
     flexDirection: "row",
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   historySection: {
-    marginTop: 10,
+    // marginTop: 10,
     paddingBottom: 35
   },
 });

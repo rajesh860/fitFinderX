@@ -3,12 +3,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import { userApi } from "../services/userService";
 import { gymList } from "./gym.services";
 import { trainerService } from "./trainer";
-
+import authReducer from "./authSlice";
 export const store = configureStore({
   reducer: {
     [userApi.reducerPath]: userApi.reducer,
     [gymList.reducerPath]: gymList.reducer,
     [trainerService.reducerPath]: trainerService.reducer,
+        auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().

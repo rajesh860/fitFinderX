@@ -21,16 +21,26 @@ import { useGymDetailQuery } from "../services/gym.services";
 import { COLORS } from "../theme/colors";
 import { useGymJoinMutation, useGymUserAddReviewMutation, useGymUserGetReviewQuery } from "../services/userService";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 const tabs = ["Plan", "Reviews", "Gallery"];
 
 const GymDetailsScreen = () => {
+  
+const [userRole, setUserRole] = useState<string | null>(null);
+
+useEffect(() => {
+  (async () => {
+    const role = await AsyncStorage.getItem("userRole");
+    setUserRole(role);
+  })();
+}, []);
   const route = useRoute();
   const { id } = route.params as { id: string };
   const navigation = useNavigation();
   const scrollRef = useRef<ScrollView>(null);
-
+const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("Plan");
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(0);
@@ -41,8 +51,7 @@ const GymDetailsScreen = () => {
 
   const { data: gymData, refetch: refetchGym } = useGymDetailQuery(id);
   const { data: gymUserReviews, refetch: refetchReviews } = useGymUserGetReviewQuery(id);
-  console.log(gymUserReviews, "gymUserReviews");
-  console.log(gymData, "gymData");
+
 
   const [joinTrigger, { isLoading }] = useGymJoinMutation();
   const [addReviewTrigger] = useGymUserAddReviewMutation();
@@ -97,6 +106,7 @@ const GymDetailsScreen = () => {
   const handleJoinNow = async () => {
     try {
       await joinTrigger(id).unwrap();
+      refetchGym()
       Toast.show({ type: "success", text1: "Successfully Joined!", position: "top", visibilityTime: 2000 });
     } catch (err: any) {
       let msg = "An unexpected error occurred.";
@@ -137,7 +147,6 @@ const GymDetailsScreen = () => {
 
   // Use reviews directly from API
   const reviews = gymUserReviews?.data || [];
-
   return (
     <>
       <GymDetailsHeader navigation={navigation} title="Gym Detail" like={true} onLogout={false} />
@@ -158,18 +167,34 @@ const GymDetailsScreen = () => {
             {renderStars(gymData?.data?.avgRating || 0)}
             <Text style={styles.ratingText}> ({reviews.length} reviews)</Text>
           </View>
-          <Text style={styles.desc}>{gymData?.data?.aboutGym}</Text>
+         {/* About Gym with See More / See Less */}
+<View style={{ marginTop: 4 }}>
+  <Text
+    style={styles.desc}
+    numberOfLines={expanded ? undefined : 4}
+  >
+    {gymData?.data?.aboutGym || "No description available."}
+  </Text>
+
+  {gymData?.data?.aboutGym?.length > 150 && (
+    <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+      <Text style={styles.seeMore}>
+        {expanded ? "See Less" : "See More"}
+      </Text>
+    </TouchableOpacity>
+  )}
+</View>
         </View>
 
         {/* Amenities */}
-        <View style={styles.amenitiesRow}>
+        {/* <View style={styles.amenitiesRow}>
           {["barbell-outline", "water-outline", "car-outline"].map((icon, idx) => (
             <View key={idx} style={styles.amenityCard}>
               <Ionicons name={icon as any} size={28} color={COLORS.primary} />
               <Text style={styles.amenityText}>{["Equipment", "Shower", "Parking"][idx]}</Text>
             </View>
           ))}
-        </View>
+        </View> */}
 
         {/* Tabs */}
         <View style={styles.tabWrapper}>
@@ -190,15 +215,15 @@ const GymDetailsScreen = () => {
               {gymData?.data?.plans?.map((plan: any, idx: number) => {
                 const style = planStyle[idx % planStyle.length];
                 return (
-                  <Card key={idx} style={[styles.planBox, { backgroundColor: style.bgColor, borderColor: style.borderColor, borderWidth: 1 }]} onPress={() => navigation.navigate("planDetail", { plans: plan, memberId: gymData?.data?._id, planStyle: style })}>
+                  <Card key={idx} style={[styles.planBox, {  backgroundColor: "#1e293b", borderColor: style.borderColor, borderWidth: 1 }]} onPress={() => navigation.navigate("planDetail", { planId: plan?.planId })}>
                     <Card.Content style={styles.planRow}>
                       <View>
-                        <Text style={[styles.planTitle, { color: style.color }]}>{plan.planName}</Text>
-                        <Text style={[styles.planDesc, { color: style.color }]}>View More</Text>
+                        <Text style={[styles.planTitle, { color: COLORS.gray100 }]}>{plan.planName}</Text>
+                        <Text style={[styles.planDesc, { color: COLORS.gray100 }]}>View More</Text>
                       </View>
                       <View style={{ alignItems: "flex-end" }}>
-                        <Text style={[styles.planPrice, { color: style.color }]}>{plan.price}/month</Text>
-                        {plan.tag && <Text style={[styles.popularTag, { backgroundColor: style.color }]}>{plan.tag}</Text>}
+                        <Text style={[styles.planPrice, { color: COLORS.gray100 }]}>{plan.price}/month</Text>
+                        {plan.tag && <Text style={[styles.popularTag, { backgroundColor: COLORS.gray100 }]}>{plan.tag}</Text>}
                       </View>
                     </Card.Content>
                   </Card>
@@ -246,7 +271,7 @@ const GymDetailsScreen = () => {
 
           {/* Gallery */}
           <View style={{ width }}>
-            <ScrollView contentContainerStyle={{ padding: 8 }}>
+            <ScrollView contentContainerStyle={{ padding: 16 }}>
               <Text style={styles.sectionTitle}>Gym Gallery</Text>
               <View style={styles.galleryContainer}>
                 {gymData?.data?.images?.map((img: any, idx: number) => (
@@ -282,53 +307,55 @@ const GymDetailsScreen = () => {
 
       </ScrollView>
 
-      {/* Fixed Bottom Buttons */}
-      <View style={styles.footer}>
-        {gymData?.data?.currentGymId === id ? (
-          // ✅ Already Joined
-          <Button
-            mode="contained"
-            style={[styles.button, { width: "100%" }]}
-            labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
-            disabled
-          >
-            Already Joined
-          </Button>
-        ) : gymData?.data?.gymApply?.applied ? (
-          // ✅ Applied but Pending
-          <Button
-            mode="contained"
-            style={[styles.button, { width: "100%" }]}
-            labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
-            disabled
-          >
-            Pending Approval
-          </Button>
-        ) : (
-          // ✅ Default: Show Join Now + Book Trial
-          <>
-            <Button
-              mode="contained"
-              style={styles.button}
-              labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
-              loading={isLoading}
-              disabled={isLoading}
-              onPress={() => setConfirmVisible(true)}
-            >
-              Join Now
-            </Button>
+     {/* Fixed Bottom Buttons */}
+{userRole !== "demo" && (
+  <View style={styles.footer}>
+    {gymData?.data?.currentGymId === id ? (
+      // ✅ Already Joined
+      <Button
+        mode="contained"
+        style={[styles.button, { width: "100%" }]}
+        labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
+        disabled
+      >
+        Already Joined
+      </Button>
+    ) : gymData?.data?.gymApply?.applied ? (
+      // ✅ Applied but Pending
+      <Button
+        mode="contained"
+        style={[styles.button, { width: "100%" }]}
+        labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
+        disabled
+      >
+        Pending Approval
+      </Button>
+    ) : (
+      // ✅ Default: Show Join Now + Book Trial
+      <>
+        <Button
+          mode="contained"
+          style={styles.button}
+          labelStyle={{ color: COLORS.textPrimary, fontWeight: 'bold' }}
+          loading={isLoading}
+          disabled={isLoading}
+          onPress={() => setConfirmVisible(true)}
+        >
+          Join Now
+        </Button>
 
-            <Button
-              mode="outlined"
-              style={styles.buttonTrial}
-              labelStyle={{ color: COLORS.textPrimary }}
-              onPress={() => navigation.navigate('booktrail', { gym: gymData?.data })}
-            >
-              Book Trial
-            </Button>
-          </>
-        )}
-      </View>
+        <Button
+          mode="outlined"
+          style={styles.buttonTrial}
+          labelStyle={{ color: COLORS.textPrimary }}
+          onPress={() => navigation.navigate('booktrail', { gym: gymData?.data })}
+        >
+          Book Trial
+        </Button>
+      </>
+    )}
+  </View>
+)}
 
 
 
@@ -355,6 +382,12 @@ const styles = StyleSheet.create({
   gymName: { fontSize: 22, fontWeight: "700", color: COLORS.textPrimary },
   row: { flexDirection: "row", alignItems: "center", marginTop: 6 },
   location: { color: COLORS.textSecondary, fontSize: 14, marginLeft: 4 },
+  seeMore: {
+  color: COLORS.primary,
+  fontSize: 13,
+  fontWeight: "600",
+  marginTop: 4,
+},
   ratingText: { color: COLORS.textSecondary, fontSize: 13 },
   desc: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
   tabWrapper: {
@@ -394,8 +427,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   amenitiesRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 6, borderBottomColor: COLORS.gray700, borderBottomWidth: 0.5, paddingBottom: 28, marginBottom: 12 },
-  amenityCard: { alignItems: "center", justifyContent: "center", width: 80, height: 80, backgroundColor: COLORS.gray700, borderRadius: 12, elevation: 1 },
-  amenityText: { fontSize: 13, fontWeight: "600", color: COLORS.textPrimary, marginTop: 6 },
+  amenityCard: { alignItems: "center", justifyContent: "center", width: 70, height: 60, backgroundColor: COLORS.gray700, borderRadius: 12, elevation: 1 },
+  amenityText: { fontSize: 12, fontWeight: "600", color: COLORS.textPrimary, marginTop: 6 },
   reviewCard: {
     backgroundColor: COLORS.gray700,
     padding: 12,

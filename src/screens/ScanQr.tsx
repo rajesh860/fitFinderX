@@ -11,13 +11,15 @@ import { Camera } from "react-native-camera-kit";
 import { useGymUserMarkAttendanceMutation } from "../services/userService";
 import { COLORS } from "../theme/colors";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import GymDetailsHeader from "../component/appHeader";
+import { useNavigation } from "@react-navigation/native";
 
 const TestCamera = () => {
   const [isScanning, setIsScanning] = useState(true);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [hasPermission, setHasPermission] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
-
+const navigation = useNavigation<any>();
   const [markAttendance, { data, error, isLoading, isSuccess, isError }] =
     useGymUserMarkAttendanceMutation();
 
@@ -111,6 +113,8 @@ const TestCamera = () => {
   }
 
   return (
+    <>
+    <GymDetailsHeader title="Scan Qr" navigation={navigation}/>
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {isScanning ? (
         cameraReady ? (
@@ -126,6 +130,7 @@ const TestCamera = () => {
         </View>
       )}
     </View>
+      </>
   );
 };
 

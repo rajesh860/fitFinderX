@@ -3,26 +3,24 @@ import { View, StyleSheet } from "react-native";
 import { Card, Chip, Text } from "react-native-paper";
 
 interface AboutSectionProps {
-    trainer: {
-        about: string;
-        badges: string[];
-    };
+   
+    user:any,
 }
 
-const AboutSection: React.FC<AboutSectionProps> = ({ trainer }) => {
+const AboutSection: React.FC<AboutSectionProps> = ({user }) => {
     return (
         <Card style={styles.card}>
             <Card.Content>
                 <Text style={styles.sectionTitle}>About</Text>
-                <Text style={styles.paragraph}>{trainer.about}</Text>
+                <Text style={styles.paragraph}>{user?.bio}</Text>
 
-                <View style={styles.badgesRow}>
+                {/* <View style={styles.badgesRow}>
                     {trainer.badges.map((badge) => (
                         <Chip key={badge} style={styles.badge} textStyle={styles.badgeText} compact>
                             {badge}
                         </Chip>
                     ))}
-                </View>
+                </View> */}
             </Card.Content>
         </Card>
     );

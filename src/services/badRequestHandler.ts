@@ -13,47 +13,66 @@ export const dynamicBaseQuery = async (
   api: WebApi,
   extraOptions: any
 ) => {
-  const token = await AsyncStorage.getItem("token");
-  const rawBaseQuery = fetchBaseQuery({
-    // baseUrl: 'http://10.252.84.250:3001',
-    baseUrl: 'http://13.60.166.240/api',
-    // baseUrl: 'https://464901a93f7a.ngrok-free.app',
-    prepareHeaders: (headers) => {
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+  try {
+    // ✅ Get token from Redux first
+    const reduxState = api.getState();
+    const tokenFromRedux = reduxState?.auth?.token || null;
+    
+    // ✅ Fallback to AsyncStorage
+    const token = tokenFromRedux || (await AsyncStorage.getItem("token"));
+    
+    const rawBaseQuery = fetchBaseQuery({
+      baseUrl: 'http://13.60.166.240/api',
+      // baseUrl: "https://bfc2b6826713.ngrok-free.app",
+      prepareHeaders: (headers) => {
+        if (token) headers.set("Authorization", `Bearer ${token}`);
+        return headers;
+      },
+    });
+
+    const result = await rawBaseQuery(args, api, extraOptions);
+
+    // 🧩 Handle API errors
+    if (result?.error) {
+      const error = result.error as FetchBaseQueryError;
+      const status = error.status;
+
+      // ✅ Network error (no internet)
+      if (status === "FETCH_ERROR") {
+        Toast.show({
+          type: "error",
+          text1: "No Internet Connection",
+          text2: "Please check your network and try again.",
+        });
+        return result;
       }
-      return headers;
-    },
-  });
 
-  const result = await rawBaseQuery(args, api, extraOptions);
-
-  if (result?.error) {
-    const error = result.error as FetchBaseQueryError;
-    const responseMessage = (error.data as any)?.message || "An error occurred";
-    const status = error.status;
-
-    if (status === 401 || status === 403) {
-      // await AsyncStorage.clear();
-      // In React Native, use navigation or other method instead of window.location
-      // Example: Navigate to login screen
-      Toast.show({
-        type: 'error',
-        text1: 'Unauthorized',
-        text2: 'Please login again.',
-      });
-
-      // ✅ Navigate to AuthScreen
-      navigate('AuthScreen');
-      // You can dispatch navigation action here if needed
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: responseMessage,
-      });
+      // ✅ Unauthorized
+      if (status === 401 || status === 403) {
+        Toast.show({
+          type: "error",
+          text1: "Session expired",
+          text2: "Please login again.",
+        });
+        navigate("AuthScreen");
+      } else {
+        const responseMessage = (error.data as any)?.message || "An error occurred";
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: responseMessage,
+        });
+      }
     }
-  }
 
-  return result;
+    return result;
+  } catch (err) {
+    console.log("⚠️ dynamicBaseQuery unexpected error:", err);
+    Toast.show({
+      type: "error",
+      text1: "Network Error",
+      text2: "Unable to connect to the server.",
+    });
+    return { error: err };
+  }
 };

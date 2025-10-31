@@ -17,8 +17,54 @@ export const trainerService = createApi({
         body
       })
     }),
+    addAvailability: builder.mutation<trainer, string | any>({
+      query: ({body,trainerId}) => ({
+        url: `/trainer/update-profile/${trainerId}`,
+        method: "POST",
+        body:body
+      })
+    }),
+    trainerProfile: builder.query<trainer, string | void>({
+      query: () => ({
+        url: `/trainer/profile`,
+        method: "GET",
+      })
+    }),
+  
+    trainerDetail: builder.query<trainer, string | void>({
+      query: (trainerId) => ({
+        url: `/trainer/detail/${trainerId}`,
+        method: "GET",
+      })
+    }),
+    addTrainer: builder.mutation<trainer, string | any>({
+      query: ({body,trainerId}) => ({
+        url: `/trainer/add-review/${trainerId}`,
+        method: "POST",
+        body:body
+      })
+    }),
+    getTrainerReview: builder.query<trainer, string | any>({
+      query: (trainerId) => ({
+        url: `/trainer/get-review/${trainerId}`,
+        method: "GET",
+      })
+    }),
+    trainerBooking: builder.mutation<trainer, string | any>({
+      query: (body) => ({
+        url: `/trainer/hire/`,
+        method: "POST",
+        body
+      })
+    }),
+    availableSlots: builder.query<trainer, string | any>({
+      query: (trainerId) => ({
+        url: `/trainer/available-slots/${trainerId}`,
+        method: "GET",
+      })
+    }),
   
   }),
 });
 
-export const { useAllTrainerListQuery } = trainerService;
+export const {useAvailableSlotsQuery,useTrainerBookingMutation,useGetTrainerReviewQuery,useAddTrainerMutation,useTrainerDetailQuery, useAllTrainerListQuery,useAddAvailabilityMutation,useTrainerProfileQuery } = trainerService;
