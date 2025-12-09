@@ -34,7 +34,7 @@ const AuthScreen = () => {
           <View style={styles.logoCircle}>
             <Text style={{ fontSize: 24, color: "#fff" }}>🏋️</Text>
           </View>
-          <Text style={styles.appName}>FitConnect</Text>
+          <Text style={styles.appName}>Fit Muscle</Text>
           <Text style={styles.subtitle}>Find and book your perfect gym</Text>
         </View>
 

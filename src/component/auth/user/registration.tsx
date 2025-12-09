@@ -64,6 +64,7 @@ const UserRegistration = () => {
                 <TextInput
                     label="Full Name"
                     value={name}
+                      textColor={COLORS.gray100}
                     onChangeText={setName}
                     mode="outlined"
                     style={[styles.input]}
@@ -80,6 +81,7 @@ const UserRegistration = () => {
                     value={email}
                     onChangeText={setEmail}
                     mode="outlined"
+                      textColor={COLORS.gray100}
                     style={[styles.input]}
                     activeOutlineColor={COLORS.primary}
                     theme={{
@@ -94,6 +96,7 @@ const UserRegistration = () => {
                     value={phone}
                     onChangeText={setPhone}
                     mode="outlined"
+                      textColor={COLORS.gray100}
                     style={[styles.input]}
                     activeOutlineColor={COLORS.primary}
                     theme={{
@@ -110,6 +113,7 @@ const UserRegistration = () => {
                     value={password}
                     onChangeText={setPassword}
                     mode="outlined"
+                      textColor={COLORS.gray100}
                     secureTextEntry={!showPassword} // 👈 toggle password
                     style={[styles.input]}
                     activeOutlineColor={COLORS.primary}

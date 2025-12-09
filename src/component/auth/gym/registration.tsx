@@ -110,6 +110,7 @@ const GymRegistration = () => {
           {fields.map(({ key, label }) => (
             <TextInput
               key={key}
+                textColor={COLORS.gray100}
               label={label}
               value={form[key as keyof typeof form]}
               onChangeText={(val) => handleChange(key, val)}
@@ -127,6 +128,7 @@ const GymRegistration = () => {
 
           <TextInput
             label="Password"
+              textColor={COLORS.gray100}
             value={form.password}
             onChangeText={(val) => handleChange("password", val)}
             mode="outlined"

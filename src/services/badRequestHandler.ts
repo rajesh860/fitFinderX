@@ -22,8 +22,8 @@ export const dynamicBaseQuery = async (
     const token = tokenFromRedux || (await AsyncStorage.getItem("token"));
     
     const rawBaseQuery = fetchBaseQuery({
-      baseUrl: 'http://13.60.166.240/api',
-      // baseUrl: "https://bfc2b6826713.ngrok-free.app",
+      baseUrl: 'https://fitmuscle.in/api',
+      // baseUrl: "https://d4b5c33208f4.ngrok-free.app",
       prepareHeaders: (headers) => {
         if (token) headers.set("Authorization", `Bearer ${token}`);
         return headers;

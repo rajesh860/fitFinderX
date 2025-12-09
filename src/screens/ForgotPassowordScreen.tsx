@@ -50,11 +50,13 @@ const ForgotPasswordScreen = () => {
                 labelStyle={{ color: COLORS.textPrimary, fontSize: 16 }
                 }
                 disabled={isLoading}
+                loading={isLoading}
             >
+                  {/* {isLoading && <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 10 }} />} */}
                 {isLoading ? "Sending..." : "Send OTP"}
             </Button>
 
-            {isLoading && <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 10 }} />}
+          
         </View>
     );
 };

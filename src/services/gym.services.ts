@@ -39,7 +39,13 @@ export const gymList = createApi({
         method: "GET",
       })
     }),
+    gymTrainer: builder.query<any, any>({
+      query: (id) => ({
+        url: `/gym/get-trainer-list/${id}`,
+        method: "GET",
+      })
+    }),
   }),
 });
 
-export const { useGetAllGymListQuery, useGymRegisterMutation, useGymDetailQuery } = gymList;
+export const {useGymTrainerQuery, useGetAllGymListQuery, useGymRegisterMutation, useGymDetailQuery } = gymList;

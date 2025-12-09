@@ -130,11 +130,40 @@ const OtpForResetScreen = () => {
                 Verify OTP
             </Button>
 
-            <TouchableOpacity onPress={onResend} disabled={timeLeft > 0}>
-                <Text style={[styles.resendText, { color: timeLeft > 0 ? COLORS.textMuted : COLORS.error }]}>
-                    Resend OTP
-                </Text>
-            </TouchableOpacity>
+           <View 
+    style={{ 
+        flexDirection: "row", 
+        justifyContent: "space-between", 
+        marginTop: 20, 
+        paddingHorizontal: 20 
+    }}
+>
+    {/* Change Email */}
+    <TouchableOpacity onPress={() => navigation.navigate("ForgotPasswordScreen")}>
+        <Text 
+            style={{
+                fontSize: 14,
+                fontWeight: "600",
+                color: COLORS.primary,
+            }}
+        >
+            Change Email
+        </Text>
+    </TouchableOpacity>
+
+    {/* Resend OTP */}
+    <TouchableOpacity onPress={onResend} disabled={timeLeft > 0}>
+        <Text
+            style={{
+                fontSize: 14,
+                fontWeight: "700",
+                color: timeLeft > 0 ? COLORS.textMuted : COLORS.error,
+            }}
+        >
+            Resend OTP
+        </Text>
+    </TouchableOpacity>
+</View>
 
             {isLoading && (
                 <Modal transparent visible={isLoading} animationType="fade">
@@ -156,7 +185,7 @@ const styles = StyleSheet.create({
     otpContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
     otpInput: { borderBottomWidth: 2, borderColor: COLORS.primary, width: 45, height: 50, fontSize: 20, borderRadius: 5, color: COLORS.textPrimary },
     timerText: { textAlign: "center", marginBottom: 10, color: COLORS.error },
-    submitButton: { backgroundColor: COLORS.primary, paddingVertical: 8, borderRadius: 8, marginBottom: 10 },
+    submitButton: { backgroundColor: COLORS.primary, paddingVertical: 4, borderRadius: 8, marginBottom: 10 },
     resendText: { textAlign: "center", fontWeight: "bold" },
     overlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.6)" },
 });

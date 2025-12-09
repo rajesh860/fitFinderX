@@ -18,11 +18,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan ,active}) => {
         <Text
         style={[
           styles.statusChip,
-          active === "Active" ? styles.active : styles.inactive,
+          !active ? styles.active : styles.inactive,
         ]}
         //   textStyle={styles.statusText}
         >
-          {active?.toUpperCase() || "INACTIVE"}
+          {active?"Expired":"Active"}
         </Text>
     }
       </View>
@@ -45,7 +45,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan ,active}) => {
       <View style={styles.rowBetweenInfo}>
         <View style={styles.infoItem}>
           <View style={styles.iconBox}>
-            <Icon name="pricetag" size={24} color="#ff914d" />
+            <Icon name="cash-multiple" size={24} color="#ff914d" />
           </View>
           <View style={styles.infoTextBox}>
             <Text style={styles.infoLabel}>Price</Text>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   active: { backgroundColor: "#4caf50" },
-  inactive: { backgroundColor: "#f57c00" },
+  inactive: { backgroundColor: "#f50000ff" },
   gymRow: {
     flexDirection: "row",
     alignItems: "center",

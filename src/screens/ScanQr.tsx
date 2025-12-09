@@ -69,7 +69,21 @@ const navigation = useNavigation<any>();
     if (isSuccess) setStatus("success");
     if (isError) setStatus("error");
   }, [isLoading, isSuccess, isError]);
+useEffect(() => {
+  if (isLoading) setStatus("loading");
 
+  if (isSuccess) {
+    setStatus("success");
+
+    // ✅ Delay slightly for user to see success message
+    setTimeout(() => {
+      // Navigate to Home tab inside MainTabs
+      navigation.navigate("MainTabs", { screen: "Home" });
+    }, 1500);
+  }
+
+  if (isError) setStatus("error");
+}, [isLoading, isSuccess, isError]);
   const renderContent = () => {
     switch (status) {
       case "loading":

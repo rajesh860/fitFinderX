@@ -85,10 +85,10 @@ export default function TrainerSearchScreen() {
     <View style={styles.container}>
       {/* Header */}
       <GymDetailsHeader
-        navigation={navigation}
         title="Trainers"
-        like={false}
-        onLogout={false}
+        navigation={navigation}
+        // like={false}
+        // onLogout={false}
       />
 
       {/* Search & Filter */}
@@ -103,7 +103,7 @@ export default function TrainerSearchScreen() {
           theme={{ roundness: 10 }}
         />
 
-        <Menu
+        {/* <Menu
           visible={menuVisible}
           onDismiss={() => setMenuVisible(false)}
           anchor={
@@ -148,7 +148,7 @@ export default function TrainerSearchScreen() {
               filter === "Featured" ? styles.activeMenuItem : styles.menuItem
             }
           />
-        </Menu>
+        </Menu> */}
       </View>
 
       {/* Trainers List */}
@@ -157,7 +157,7 @@ export default function TrainerSearchScreen() {
         keyExtractor={(item: any) => item._id?.toString() || Math.random().toString()}
         ListHeaderComponent={
           <>
-            {/* Featured Trainer */}
+            {/* Featured Trainer
             <Text style={styles.sectionTitle}>Featured Trainers</Text>
             <Card style={[styles.trainerCard, styles.featuredCard]}>
               <View style={styles.cardRow}>
@@ -185,7 +185,7 @@ export default function TrainerSearchScreen() {
               </View>
             </Card>
 
-            {/* All Trainers header */}
+            All Trainers header
             <View style={styles.allHeader}>
               <Text style={styles.sectionTitle}>All Trainers</Text>
               <TouchableOpacity onPress={() => setShowAll((prev) => !prev)}>
@@ -193,7 +193,7 @@ export default function TrainerSearchScreen() {
                   {showAll ? "View Less" : "View All"}
                 </Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
           </>
         }
         renderItem={({ item }: any) => {
@@ -202,7 +202,7 @@ export default function TrainerSearchScreen() {
             <Card
               style={styles.trainerCard}
               onPress={() =>
-                navigation.navigate("trainerDetail", { trainerId: item._id })
+                navigation.navigate("TrainerDetailScreen", { trainerId: item._id })
               }
             >
               <View style={styles.cardRow}>

@@ -277,6 +277,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 14,
     elevation: 0,
+    alignItems:"center",
+    display:"flex",
   },
   activeChip: {
     backgroundColor: "#1a7f46",
@@ -284,13 +286,13 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   expiredChip: {
-    backgroundColor: "#5c6168",
+    backgroundColor: "#e40a0aff",
   },
   chipText: {
     color: "#fff",
     fontSize: 12,
     fontWeight: "700",
-    textAlign: "center"
+    textAlign: "center",
   },
   planType: {
     fontSize: 12,

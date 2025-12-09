@@ -6,25 +6,27 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TextInput,
   TouchableOpacity,
   Dimensions,
   Modal,
   RefreshControl,
-  FlatList,
 } from "react-native";
-import { ActivityIndicator, Button, Card } from "react-native-paper";
+import { ActivityIndicator, Button } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import GymDetailsHeader from "../component/appHeader";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useGymDetailQuery } from "../services/gym.services";
 import { COLORS } from "../theme/colors";
-import { useGymJoinMutation, useGymUserAddReviewMutation, useGymUserGetReviewQuery } from "../services/userService";
+import { useGymJoinMutation, useGymUserGetReviewQuery } from "../services/userService";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PlanTab from "../component/gymDetailScreen/PlanTab";
+import ReviewTab from "../component/gymDetailScreen/ReviewTab";
+import GalleryTab from "../component/gymDetailScreen/GalleryTab";
+import TrainerTab from "../component/gymDetailScreen/TrainerTab";
 
 const { width } = Dimensions.get("window");
-const tabs = ["Plan", "Reviews", "Gallery"];
+const tabs = ["Plan", "Reviews", "Gallery","Trainers"];
 
 const GymDetailsScreen = () => {
   
@@ -42,9 +44,6 @@ useEffect(() => {
   const scrollRef = useRef<ScrollView>(null);
 const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("Plan");
-  const [newReview, setNewReview] = useState("");
-  const [newRating, setNewRating] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -54,7 +53,7 @@ const [expanded, setExpanded] = useState(false);
 
 
   const [joinTrigger, { isLoading }] = useGymJoinMutation();
-  const [addReviewTrigger] = useGymUserAddReviewMutation();
+
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
@@ -72,36 +71,7 @@ const [expanded, setExpanded] = useState(false);
     setRefreshing(false);
   };
 
-  const addReview = async () => {
-    if (!newReview.trim() || newRating === 0) return;
 
-    try {
-      const res = await addReviewTrigger({ gymId: id, rating: newRating, comment: newReview }).unwrap();
-
-      Toast.show({
-        type: "success",
-        text1: res.message || "Review added successfully",
-        position: "top",
-        visibilityTime: 3000,
-      });
-
-      setNewReview("");
-      setNewRating(0);
-      setModalVisible(false);
-
-      // Refresh reviews from API
-      refetchReviews();
-
-    } catch (err: any) {
-      Toast.show({
-        type: "error",
-        text1: "Failed to add review",
-        text2: err?.data?.message || "Something went wrong",
-        position: "top",
-        visibilityTime: 2500,
-      });
-    }
-  };
 
   const handleJoinNow = async () => {
     try {
@@ -132,24 +102,20 @@ const [expanded, setExpanded] = useState(false);
         <View style={styles.overlay}>
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loaderText}>Loading Gym...</Text>
+            <Text style={styles.loaderText}>Loading...</Text>
           </View>
         </View>
       </Modal>
     );
   }
 
-  const planStyle = [
-    { name: "basic", bgColor: "rgba(230, 244, 255, 0.8)", borderColor: "#91caff", color: "#0958d9" },
-    { name: "silver", bgColor: COLORS.gray700, borderColor: "transparent", color: COLORS.textPrimary },
-    { name: "gold", bgColor: "#fffbe6", borderColor: "#ffe58f", color: "#d48806" },
-  ];
+  
 
   // Use reviews directly from API
   const reviews = gymUserReviews?.data || [];
   return (
     <>
-      <GymDetailsHeader navigation={navigation} title="Gym Detail" like={true} onLogout={false} />
+      <GymDetailsHeader navigation={navigation} title="Gym Detail" like={false} onLogout={false} />
       <ScrollView style={{ flex: 1, backgroundColor: COLORS.background }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Banner */}
         <View style={styles.banner}>
@@ -209,101 +175,18 @@ const [expanded, setExpanded] = useState(false);
         {/* Horizontal Sections */}
         <ScrollView horizontal pagingEnabled ref={scrollRef} onMomentumScrollEnd={e => setActiveTab(tabs[Math.round(e.nativeEvent.contentOffset.x / width)])} showsHorizontalScrollIndicator={false}>
           {/* Plan */}
-          <View style={{ width }}>
-            <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 4 }}>
-              <Text style={styles.sectionTitle}>Membership Plans</Text>
-              {gymData?.data?.plans?.map((plan: any, idx: number) => {
-                const style = planStyle[idx % planStyle.length];
-                return (
-                  <Card key={idx} style={[styles.planBox, {  backgroundColor: "#1e293b", borderColor: style.borderColor, borderWidth: 1 }]} onPress={() => navigation.navigate("planDetail", { planId: plan?.planId })}>
-                    <Card.Content style={styles.planRow}>
-                      <View>
-                        <Text style={[styles.planTitle, { color: COLORS.gray100 }]}>{plan.planName}</Text>
-                        <Text style={[styles.planDesc, { color: COLORS.gray100 }]}>View More</Text>
-                      </View>
-                      <View style={{ alignItems: "flex-end" }}>
-                        <Text style={[styles.planPrice, { color: COLORS.gray100 }]}>{plan.price}/month</Text>
-                        {plan.tag && <Text style={[styles.popularTag, { backgroundColor: COLORS.gray100 }]}>{plan.tag}</Text>}
-                      </View>
-                    </Card.Content>
-                  </Card>
-                );
-              })}
-            </ScrollView>
-          </View>
+       <PlanTab width={width} gymData={gymData}/>
 
           {/* Reviews */}
-          <View style={{ width }}>
-            <FlatList
-              data={reviews}
-              keyExtractor={(item, idx) => idx.toString()}
-              contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-              ListHeaderComponent={<Text style={styles.sectionTitle}>Members Reviews</Text>}
-              renderItem={({ item }) => (
-                <View style={styles.reviewCard}>
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                    <Text style={styles.reviewUser}>{item?.user?.name?.trim() || "Anonymous"}</Text>
-                    <Text style={styles.reviewDate}>
-                      {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </Text>
-                  </View>
-
-                  <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 4 }}>
-                    {renderStars(item.rating)}
-                    <Text style={{ fontSize: 13, color: COLORS.gray300, marginLeft: 6 }}>{item.rating}/5</Text>
-                  </View>
-
-                  <Text style={styles.reviewText}>{item.comment || "No comment provided."}</Text>
-                </View>
-              )}
-
-              ListFooterComponent={
-                <Button mode="contained" style={[styles.submitBtn, { marginTop: 12 }]} labelStyle={{ color: COLORS.primary }} onPress={() => setModalVisible(true)}>
-                  Add Review
-                </Button>
-              }
-            />
-          </View>
-
+        
+<ReviewTab width={width} reviews={reviews} refetchReviews={refetchReviews}/>
           {/* Gallery */}
-          <View style={{ width }}>
-            <ScrollView contentContainerStyle={{ padding: 16 }}>
-              <Text style={styles.sectionTitle}>Gym Gallery</Text>
-              <View style={styles.galleryContainer}>
-                {gymData?.data?.images?.map((img: any, idx: number) => (
-                  <View key={idx} style={styles.galleryCard}>
-                    <Image source={{ uri: typeof img === "string" ? img : img.url }} style={styles.galleryImg} resizeMode="cover" />
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          </View>
+          <GalleryTab width={width} gymData={gymData}/>
+        {/* Trainers */}
+<TrainerTab width={width}  />
         </ScrollView>
 
-        {/* Review Modal */}
-        <Modal visible={modalVisible} transparent animationType="slide">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalBox}>
-              <Text style={styles.modalTitle}>Write a Review</Text>
-              <TextInput value={newReview} onChangeText={setNewReview} placeholder="Write your review..." style={styles.input} multiline />
-              <View style={styles.starsRow}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <TouchableOpacity key={star} onPress={() => setNewRating(star)}>
-                    <Ionicons name={newRating >= star ? "star" : "star-outline"} size={22} color={COLORS.primary} style={{ marginHorizontal: 3.5 }} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 12 }}>
-                <Button mode="contained" style={{ backgroundColor: COLORS.gray600, flex: 1, marginRight: 8 }} labelStyle={{ color: COLORS.textPrimary }} onPress={() => setModalVisible(false)}>Cancel</Button>
-                <Button mode="contained" style={{ backgroundColor: COLORS.primary, flex: 1 }} labelStyle={{ color: COLORS.textPrimary }} onPress={addReview}>Submit</Button>
-              </View>
-            </View>
-          </View>
-        </Modal>
+   
 
       </ScrollView>
 
@@ -407,39 +290,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   sectionTitle: { fontSize: 16, fontWeight: "600", marginTop: 12, marginBottom: 14, color: COLORS.textPrimary },
-  planBox: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginBottom: 14,
-    elevation: 2,
-  },
-  planRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  planTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textPrimary },
-  planDesc: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2, fontWeight: 'bold' },
-  planPrice: { fontSize: 15, fontWeight: "700", color: COLORS.textPrimary },
-  popularTag: {
-    backgroundColor: COLORS.success,
-    color: COLORS.textPrimary,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginTop: 4,
-    fontSize: 12,
-  },
-  amenitiesRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 6, borderBottomColor: COLORS.gray700, borderBottomWidth: 0.5, paddingBottom: 28, marginBottom: 12 },
-  amenityCard: { alignItems: "center", justifyContent: "center", width: 70, height: 60, backgroundColor: COLORS.gray700, borderRadius: 12, elevation: 1 },
-  amenityText: { fontSize: 12, fontWeight: "600", color: COLORS.textPrimary, marginTop: 6 },
-  reviewCard: {
-    backgroundColor: COLORS.gray700,
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 1,
-  },
-  reviewUser: { fontWeight: "600", marginBottom: 1, fontSize: 16, color: COLORS.textPrimary },
-  reviewText: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
-  reviewDate: { fontSize: 12,
-    color: COLORS.gray400, },
+  
+ 
+  // amenitiesRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 6, borderBottomColor: COLORS.gray700, borderBottomWidth: 0.5, paddingBottom: 28, marginBottom: 12 },
+  // amenityCard: { alignItems: "center", justifyContent: "center", width: 70, height: 60, backgroundColor: COLORS.gray700, borderRadius: 12, elevation: 1 },
+  // amenityText: { fontSize: 12, fontWeight: "600", color: COLORS.textPrimary, marginTop: 6 },
+ 
   starsRow: { flexDirection: "row", marginBottom: 6, marginTop: 10 },
   input: {
     borderWidth: 1,
@@ -452,27 +308,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gray700,
     textAlignVertical: "top",
   },
-  submitBtn: { marginTop: 6, backgroundColor: COLORS.border },
-  galleryContainer: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  galleryCard: {
-    width: "48%",
-    height: 120,
-    marginBottom: 12,
-    borderRadius: 12,
-    overflow: "hidden",
-    position: "relative",
-    elevation: 2,
-  },
-  galleryImg: { width: "100%", height: "100%" },
-  galleryOverlay: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingVertical: 4,
-    paddingHorizontal: 6,
-  },
-  galleryText: { color: "#fff", fontSize: 14, fontWeight: "600" },
 
   modalOverlay: {
     flex: 1,

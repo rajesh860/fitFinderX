@@ -80,6 +80,7 @@ const UserLogin = () => {
         label="Phone or Email"
         value={email}
         onChangeText={setEmail}
+          textColor={COLORS.gray100}
         mode="outlined"
         disabled={isLoading} // ⛔ disable while loading
         style={[styles.input]}
@@ -98,6 +99,7 @@ const UserLogin = () => {
         value={password}
         onChangeText={setPassword}
         mode="outlined"
+          textColor={COLORS.gray100}
         secureTextEntry={!showPassword}
         disabled={isLoading}
         style={[styles.input]}
@@ -130,12 +132,13 @@ const UserLogin = () => {
         labelStyle={{ color: COLORS.textPrimary, fontSize: 16 }}
         style={styles.primaryBtn}
         onPress={handleLogin}
+        loading={isLoading}
       >
-        {isLoading ? (
-          <ActivityIndicator size="small" color={COLORS.textPrimary} />
-        ) : (
-          "Login"
-        )}
+        {isLoading?"":
+      
+        "Login"
+      }
+     
       </Button>
 
       {/* <TouchableOpacity style={{ marginVertical: 6 }}>
@@ -157,12 +160,12 @@ const UserLogin = () => {
         </View>
       </Button>
 
-      <Button mode="outlined" style={styles.outlineBtn} onPress={handleGoogleSignIn}>
+      {/* <Button mode="outlined" style={styles.outlineBtn} onPress={handleGoogleSignIn}>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
           <Icon name="google" size={20} color="#DB4437" style={{ marginRight: 8 }} />
           <Text style={{ color: COLORS.textSecondary }}>Continue with Google</Text>
         </View>
-      </Button>
+      </Button> */}
 
       <Text style={styles.footerText}>
         By continuing, you agree to our{" "}

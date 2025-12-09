@@ -63,6 +63,7 @@ export const trainerService = createApi({
         method: "GET",
       })
     }),
+   
   
   }),
 });

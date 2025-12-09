@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { Text, IconButton, Button } from 'react-native-paper';
 import { COLORS } from '../../theme/colors';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 // import { useUpdateBioMutation } from '../../services/trainer'; // ✅ API import
 
@@ -32,7 +31,8 @@ useEffect(() => {
       if (!newBio) return;
 
       // ✅ API Call
-      const response = await trigger({trainerId:trainerId, bio: newBio }).unwrap();
+          const body = {  bio: newBio};
+      const response = await trigger({trainerId:trainerId, body }).unwrap();
 
       if (response?.success) {
         Toast.show({ type: "success", text1: response?.message, position: "top" });

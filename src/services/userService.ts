@@ -5,7 +5,7 @@ import { dynamicBaseQuery } from "./badRequestHandler";
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: dynamicBaseQuery,
-  tagTypes: ['Enquiries', 'User'],
+  tagTypes: ['Enquiries', 'User','Dashboard'],
   endpoints: (builder) => ({
     getUserDetail: builder.query<UserDetail, void>({
       query: () => `/user/profile`,
@@ -106,6 +106,7 @@ export const userApi = createApi({
           method: "POST",
           body
         }),
+        invalidatesTags: ["Dashboard"], // 👈 will auto refetch dashboard
     }),
     gymUserGetAttendence: builder.mutation<any, any>({
       query: (id) => (
@@ -176,6 +177,7 @@ export const userApi = createApi({
         url: `/user/dashboard`,
         method: "GET",
       }),
+          providesTags: ["Dashboard"], // 👈 important
     }),
     planDetail: builder.query<any, any>({
       query: (gymPlanId) => ({

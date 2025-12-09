@@ -17,24 +17,39 @@ import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ImageResizer from "@bam.tech/react-native-image-resizer";
 import { requestPhotoPermission } from "../../utils";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../services/authSlice";
+
+// 🔹 Safe Image URI Getter
+const getSafeImageUri = (val) => {
+  if (!val) return null;
+  if (Array.isArray(val)) return val[0];
+  if (typeof val === "object" && val.uri) return val.uri;
+  if (typeof val === "string") return val;
+  return null;
+};
 
 const Header = ({ trainerId, trigger, refetch, data }) => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [avatarUri, setAvatarUri] = useState(data?.photo || data?.avatar || "https://randomuser.me/api/portraits/men/75.jpg");
+  const [avatarUri, setAvatarUri] = useState(
+    getSafeImageUri(data?.photo) ||
+      data?.avatar ||
+      "https://randomuser.me/api/portraits/men/75.jpg"
+  );
   const [menuVisible, setMenuVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [experience, setExperience] = useState("");
-  const [tempName, setTempName] = useState<string | undefined>(undefined);
-  const [dataLoading, setDataLoading] = useState(true); // Skeleton loading
+  const [tempName, setTempName] = useState();
+  const [dataLoading, setDataLoading] = useState(true);
 
-  // 🔹 Upload new photo using your logic
+  // 🔹 Upload new photo logic
   const handleUploadImage = async () => {
     try {
       const hasPermission = await requestPhotoPermission();
-      if (!hasPermission) return Alert.alert("Permission denied", "Please allow access to photos.");
+      if (!hasPermission)
+        return Alert.alert(
+          "Permission denied",
+          "Please allow access to photos."
+        );
 
       const result = await ImagePicker.launchImageLibrary({
         mediaType: "photo",
@@ -59,29 +74,33 @@ const Header = ({ trainerId, trigger, refetch, data }) => {
         { mode: "contain", onlyScaleDown: true }
       );
 
-      const nameFile = asset.fileName || `photo.${asset.type?.split("/")[1] || "jpg"}`;
+      const nameFile =
+        asset.fileName || `photo.${asset.type?.split("/")[1] || "jpg"}`;
       const typeFile = asset.type || "image/jpeg";
 
       const formData = new FormData();
       formData.append("photo", {
-        uri: Platform.OS === "ios" ? resizedImage.uri.replace("file://", "") : resizedImage.uri,
+        uri:
+          Platform.OS === "ios"
+            ? resizedImage.uri.replace("file://", "")
+            : resizedImage.uri,
         name: nameFile,
         type: typeFile,
-      } as any);
+      });
 
       if (trigger) {
         const res = await trigger({ body: formData, trainerId }).unwrap();
-
         if (res.success) {
-          setAvatarUri(res.data?.photo || resizedImage.uri);
+          const safePhoto = getSafeImageUri(res.data?.photo) || resizedImage.uri;
+          setAvatarUri(safePhoto);
           Toast.show({ type: "success", text1: res.message });
-          if (typeof refetch === "function") refetch();
+          refetch && refetch();
         } else {
           Toast.show({ type: "error", text1: res.message });
         }
       }
-    } catch (err: any) {
-      console.log(err);
+    } catch (err) {
+      console.log("Upload error:", err);
       Alert.alert("Error", err?.data?.message || "Failed to update photo");
     } finally {
       setLoading(false);
@@ -99,12 +118,11 @@ const Header = ({ trainerId, trigger, refetch, data }) => {
     setLoading(true);
     try {
       const payload = { name: tempName, experience: experience };
-
       if (trigger) {
         const res = await trigger({ body: payload, trainerId }).unwrap();
         if (res.success) {
           Toast.show({ type: "success", text1: res.message });
-          if (typeof refetch === "function") refetch();
+          refetch && refetch();
         } else {
           Toast.show({ type: "error", text1: res.message });
         }
@@ -118,15 +136,10 @@ const Header = ({ trainerId, trigger, refetch, data }) => {
     }
   };
 
- const handleLogout = async() => {
-  // const dispatch = useDispatch();
-
-  try {
+  const handleLogout = async () => {
+    try {
       setLoading(true);
-
-   
-await AsyncStorage.clear()
-      // Show success toast
+      await AsyncStorage.clear();
       Toast.show({
         type: "success",
         text1: "Logged Out",
@@ -134,12 +147,9 @@ await AsyncStorage.clear()
         position: "bottom",
         visibilityTime: 2000,
       });
-await AsyncStorage.clear()
-      // Navigate to login screen
       navigation.replace("AuthScreen");
     } catch (error) {
-      console.log("Logout error: ", error);
-
+      console.log("Logout error:", error);
       Toast.show({
         type: "error",
         text1: "Logout Failed",
@@ -150,33 +160,35 @@ await AsyncStorage.clear()
     } finally {
       setLoading(false);
     }
-};
+  };
 
   useEffect(() => {
     if (data) {
-      setAvatarUri(data.photo || data?.avatar || "https://randomuser.me/api/portraits/men/75.jpg");
+      const safePhoto =
+        getSafeImageUri(data?.photo) ||
+        data?.avatar ||
+        "https://randomuser.me/api/portraits/men/75.jpg";
+      setAvatarUri(safePhoto);
 
-      // Derive a best-effort display name from possible shapes
       const displayName =
         data?.name ||
         data?.user?.name ||
-        (data?.first_name || data?.last_name ? `${data?.first_name || ''} ${data?.last_name || ''}`.trim() : undefined) ||
+        `${data?.first_name || ""} ${data?.last_name || ""}`.trim() ||
         data?.fullName ||
-        undefined;
+        "";
+      setTempName(displayName);
 
-      setTempName(displayName || "");
-
-      // Experience may be present under different keys depending on the API
       const exp = data?.experience ?? data?.years_experience ?? data?.exp ?? "";
       setExperience(String(exp));
-      setDataLoading(false); // Data loaded, hide skeleton
+      setDataLoading(false);
     }
   }, [data]);
+
+  const validUri = getSafeImageUri(avatarUri);
 
   return (
     <View style={styles.container}>
       {dataLoading ? (
-        // Skeleton loading
         <View style={styles.contentRow}>
           <View style={[styles.avatarSkeleton, { borderRadius: 35 }]} />
           <View style={{ marginLeft: 16, flex: 1 }}>
@@ -187,7 +199,11 @@ await AsyncStorage.clear()
       ) : (
         <View style={styles.contentRow}>
           <View style={styles.avatarContainer}>
-            <Avatar.Image size={70} source={avatarUri && { uri: avatarUri }} />
+            {validUri ? (
+              <Avatar.Image size={70} source={{ uri: validUri }} />
+            ) : (
+              <Avatar.Icon size={70} icon="account" />
+            )}
             <TouchableOpacity onPress={handleUploadImage} style={styles.editIcon}>
               <Icon name="pencil-circle" size={24} color={COLORS.primary} />
             </TouchableOpacity>
@@ -211,12 +227,16 @@ await AsyncStorage.clear()
                 <Menu.Item
                   onPress={openEditModal}
                   title="Edit"
-                  leadingIcon={() => <Icon name="pencil" size={16} color={COLORS.textPrimary} />}
+                  leadingIcon={() => (
+                    <Icon name="pencil" size={16} color={COLORS.textPrimary} />
+                  )}
                 />
                 <Menu.Item
                   onPress={handleLogout}
                   title="Logout"
-                  leadingIcon={() => <Icon name="logout" size={16} color={COLORS.textPrimary} />}
+                  leadingIcon={() => (
+                    <Icon name="logout" size={16} color={COLORS.textPrimary} />
+                  )}
                 />
               </Menu>
             </View>
@@ -231,6 +251,7 @@ await AsyncStorage.clear()
         </View>
       )}
 
+      {/* Edit Modal */}
       <Modal visible={editModalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -257,7 +278,12 @@ await AsyncStorage.clear()
             />
             <View style={styles.buttonRow}>
               <Button onPress={() => setEditModalVisible(false)}>Cancel</Button>
-              <Button mode="contained" loading={loading} onPress={handleSaveEdit} style={styles.saveButton}>
+              <Button
+                mode="contained"
+                loading={loading}
+                onPress={handleSaveEdit}
+                style={styles.saveButton}
+              >
                 Save
               </Button>
             </View>
@@ -287,7 +313,6 @@ const styles = StyleSheet.create({
   input: { backgroundColor: COLORS.gray900, color: COLORS.textPrimary, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 8, fontSize: 13, marginBottom: 12 },
   buttonRow: { flexDirection: "row", justifyContent: "flex-end", gap: 10 },
   saveButton: { backgroundColor: COLORS.primary },
-  // Skeleton styles
   avatarSkeleton: { width: 70, height: 70, backgroundColor: COLORS.gray700 },
   lineSkeleton: { width: "70%", height: 15, backgroundColor: COLORS.gray700, borderRadius: 6 },
 });

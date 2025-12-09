@@ -41,7 +41,7 @@ const trainerId=data?.data?._id;
   <Header trigger={trigger} data={data?.data}  trainerId={trainerId} refetch={refetch} />
   <Specializations isLoading={isLoading} specialization={data?.data?.specialization || []} trigger={trigger} trainerId={trainerId} refetch={refetch} />
   <About bio={data?.data?.bio} trigger={trigger} trainerId={trainerId} refetch={refetch} />
-  <Gyms refetch={refetch} />
+  <Gyms refetch={refetch} gyms={data?.data?.gyms}/>
   <Availability isLoading={isLoading} trigger={trigger} availability={data?.data?.availability} trainerId={trainerId} refetch={refetch} />
   
       {/* <Actions /> */}

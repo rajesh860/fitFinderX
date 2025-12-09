@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, use } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -8,6 +8,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useUserDashboardQuery } from "../services/userService";
 import { ActivityIndicator, Text } from "react-native-paper";
+import { useSelector } from "react-redux";
+import { COLORS } from "../theme/colors";
 
 // Components
 import Header from "../component/clientHomeComp/Header";
@@ -17,22 +19,18 @@ import ProgressCard from "../component/clientHomeComp/ProgressCard";
 import PlanCard from "../component/clientHomeComp/PlanCard";
 import TipCard from "../component/clientHomeComp/TipCard";
 import CurrentGymCard from "../component/clientHomeComp/NextSessionCard";
-import { useSelector } from "react-redux";
 
 const ClientHome = () => {
   const navigation = useNavigation();
-  const userRole = useSelector((state:any) => state.auth.userRole);
-  const { data, isLoading, isError, refetch } = useUserDashboardQuery(
-    undefined, {
-    skip: !userRole, 
-  refetchOnMountOrArgChange: true
-  }
-  
-  );
-  console.log(data,"data")
+  const userRole = useSelector((state: any) => state.auth.userRole);
+
+  const { data, isLoading, isError, refetch } = useUserDashboardQuery(undefined, {
+    skip: !userRole,
+    refetchOnMountOrArgChange: true,
+  });
+
   const [refreshing, setRefreshing] = useState(false);
 
-  // 🔄 Pull to Refresh handler
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
@@ -40,8 +38,8 @@ const ClientHome = () => {
   }, [refetch]);
 
   const userData = data?.data || {};
-
-  // ✅ Attendance calculation
+console.log(data,"yserhjk")
+  // ✅ Attendance percentage
   const attendancePercent = useMemo(() => {
     const done = userData?.attendance?.present ?? 0;
     const totalDays = userData?.plan?.totalDays ?? 0;
@@ -50,17 +48,19 @@ const ClientHome = () => {
     return Math.min(Math.max(done / totalDays, 0), 1);
   }, [userData?.attendance?.present, userData?.plan?.totalDays]);
 
-  // 🌀 Loading State
+  // 🌀 Loading UI
   if (isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator animating={true} size="large" color="#ff914d" />
-        <Text style={{ color: "#fff", marginTop: 10 }}>Loading your dashboard...</Text>
+        <Text style={{ color: "#fff", marginTop: 10 }}>
+          Loading your dashboard...
+        </Text>
       </View>
     );
   }
 
-  // ❌ Error State
+  // ❌ Error UI
   if (isError || !data?.data) {
     return (
       <View style={styles.center}>
@@ -69,11 +69,11 @@ const ClientHome = () => {
     );
   }
 
-  // ✅ Extracted user details
+  // ✅ User data object
   const user = {
     name: userData.memberName?.trim() || "User",
     memberId: userData?.memberId,
-    gymDetails:userData?.plan?.gymDetails || {},
+    gymDetails: userData?.plan?.gymDetails || {},
     attendance: {
       done: userData.attendance?.present || 0,
       total: userData.attendance?.total || 1,
@@ -81,10 +81,15 @@ const ClientHome = () => {
       streakDays: userData.attendance?.streakDays || 0,
     },
     progress: userData.progress || {},
-    plan: userData.plan || {},
+    plan: userData.plan || null,
     nextSession: userData.nextSession || {},
     tip: userData.tip || "",
   };
+
+  // 🧠 Plan expiry check
+  const today = new Date();
+  const endDate = user?.plan?.endDate ? new Date(user.plan.endDate) : null;
+  const isExpired = user?.plan?.status;
 
   return (
     <View style={styles.container}>
@@ -108,20 +113,35 @@ const ClientHome = () => {
         <QuoteCard text="Push yourself because no one else is going to do it for you." />
         <AttendanceCard
           attendance={user.attendance}
-          totalDays={user.plan.totalDays}
+          totalDays={user.plan?.totalDays || 0}
         />
         <ProgressCard progress={user.progress} />
         <PlanCard plan={user.plan} memberId={user?.memberId} />
+
+        {/* 🧩 Current Gym Card */}
         <CurrentGymCard
           gym={{
-            name: user?.plan?.gymDetails?.name,
-            planName: `${user.plan.totalDays} Days Transformation`,
+            name: user?.plan?.gymDetails?.name || "No Active Plan",
+            planName: isExpired
+              ? "No Active Membership"
+              : `${user.plan?.totalDays || 0} Days Transformation`,
             daysLeft: user?.plan?.daysLeft || 0,
-            status: user?.plan?.gymDetails?.status,
+            status: isExpired ? "expired" : user?.plan?.gymDetails?.status,
             avgRating: user?.gymDetails?.avgRating,
             totalReviews: user?.gymDetails?.totalReviews,
+            endDate: user?.plan?.endDate,
+          }}
+          expired={isExpired}
+          onRenew={() => {
+            if (isExpired) {
+              navigation.navigate("RenewPlanScreen", {
+                memberId: user?.memberId,
+                currentPlan: user.plan,
+              });
+            }
           }}
         />
+
         <TipCard tip={user.tip} />
       </ScrollView>
     </View>

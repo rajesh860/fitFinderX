@@ -236,10 +236,19 @@ useEffect(() => {
 
           <View style={styles.headerText}>
             <Text style={styles.name}>{userData?.name || "-"}</Text>
-            <View style={styles.badgeRow}>
-              <Text style={styles.activeBadge}>{userData?.gymStatus || "-"}</Text>
-              <Text style={styles.planBadge}>{userData?.planName || "-"}</Text>
-            </View>
+         <View style={styles.badgeRow}>
+  <Text
+    style={
+      userData?.gymStatus === "expired"
+        ? styles.expire
+        : styles.activeBadge
+    }
+  >
+    {userData?.gymStatus || "-"}
+  </Text>
+  <Text style={styles.planBadge}>{userData?.planName || "-"}</Text>
+</View>
+
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center", marginTop: 10, }}
               onPress={() => navigation.navigate("GymDetailsScreen", { gymId: userData?._id })}
@@ -309,22 +318,23 @@ useEffect(() => {
             </View>
 
             {/* Status */}
-            <View style={styles.rowBetween}>
+            {/* <View style={styles.rowBetween}>
               <Text style={styles.infoText}>Status</Text>
               <Text
                 style={[
                   styles.statusBadge,
+                  
                   apiData?.currentGym?.status === "active" ? styles.activeBadge : styles.inactiveBadge,
                 ]}
               >
                 {apiData?.currentGym?.status || "-"}
               </Text>
-            </View>
+            </View> */}
 
             {/* Fee Status */}
             <View style={styles.rowBetween}>
               <Text style={styles.infoText}>Fee Status</Text>
-              <Text style={styles.paidBadge}>
+              <Text style={ apiData?.currentGym?.status  ?styles?.expire :styles.paidBadge}>
                 {userData?.fee_status?.toUpperCase() || "-"}
               </Text>
             </View>
@@ -348,6 +358,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  statusBadge:{
+    textTransform:"uppercase",
+   
+  },
+  inactiveBadge:{
+    backgroundColor:"red",
+    color:"white",
+    paddingHorizontal:10,
+    borderRadius:10,
+  },
   avatarInitial: { color: "#fff", fontSize: 24, fontWeight: "700" },
   addIconWrapper: {
     position: "absolute",
@@ -358,23 +378,42 @@ const styles = StyleSheet.create({
   },
   headerText: { marginLeft: 12 },
   name: { fontSize: 18, fontWeight: "700", color: COLORS.textPrimary },
-  badgeRow: { flexDirection: "row", marginTop: 4 },
-  activeBadge: {
-    backgroundColor: "#d1f7d6",
-    color: "#1B873F",
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    fontSize: 12,
-    textTransform: "capitalize",
-    marginRight: 6,
-  },
-  planBadge: {
-    backgroundColor: "#e0e7ff",
-    color: "#4338CA",
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    fontSize: 12,
-  },
+ badgeRow: { flexDirection: "row", marginTop: 4 },
+
+activeBadge: {
+  backgroundColor: "#d1f7d6",
+  color: "#1B873F",
+  paddingHorizontal: 8,
+  paddingVertical: 4,
+  borderRadius: 12,
+  fontSize: 12,
+  textTransform: "capitalize",
+  marginRight: 6,
+  fontWeight: "600",
+},
+
+expire: {
+  backgroundColor: "#f31010ff", // light red
+  color: "#e7e7e7ff",           // deep red text
+  paddingHorizontal: 8,
+  paddingVertical: 4,
+  borderRadius: 12,
+  fontSize: 12,
+  textTransform: "capitalize",
+  marginRight: 6,
+  fontWeight: "600",
+},
+
+planBadge: {
+  backgroundColor: "#e0e7ff",
+  color: "#4338CA",
+  paddingHorizontal: 8,
+  paddingVertical: 4,
+  borderRadius: 12,
+  fontSize: 12,
+  fontWeight: "600",
+},
+
   subtitle: { fontSize: 14, color: COLORS.textPrimary, marginTop: 2 },
   statsRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 15 },
   statsCard: { alignItems: "center" },
@@ -406,6 +445,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     textTransform: "capitalize",
   },
+ 
   rowBetween: { flexDirection: "row", justifyContent: "space-between", marginVertical: 4 },
   row: { flexDirection: "row", alignItems: "center" },
   progressBtn: {

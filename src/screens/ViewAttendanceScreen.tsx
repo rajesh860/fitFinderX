@@ -312,20 +312,20 @@ const ViewAttendanceScreen = () => {
                   opacity: 1,
                 },
               }}
-              renderArrow={(direction) => {
-                const isLeft = direction === 'left';
-                const isDisabled = isLeft ? !canGoBack() : !canGoForward();
+              // renderArrow={(direction) => {
+              //   const isLeft = direction === 'left';
+              //   const isDisabled = isLeft ? !canGoBack() : !canGoForward();
                 
-                return (
-                  <View style={{ opacity: isDisabled ? 0.3 : 1 }}>
-                    <Icon 
-                      name={isLeft ? "chevron-left" : "chevron-right"} 
-                      size={24} 
-                      color={isDisabled ? COLORS.gray500 : COLORS.primary} 
-                    />
-                  </View>
-                );
-              }}
+              //   return (
+              //     <View style={{ opacity: isDisabled ? 0.3 : 1 }}>
+              //       <Icon 
+              //         name={isLeft ? "chevron-left" : "chevron-right"} 
+              //         size={24} 
+              //         color={isDisabled ? COLORS.gray500 : COLORS.primary} 
+              //       />
+              //     </View>
+              //   );
+              // }}
             />
           </View>
 

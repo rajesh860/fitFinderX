@@ -48,6 +48,8 @@ import GymsScreen from "./src/screens/GymsScreen.tsx";
 import ClientHome from "./src/screens/ClientHome.tsx";
 import TrainerBookingScreen from "./src/screens/TrainerBookingScreen.tsx";
 import AddPlanScreen from "./src/screens/addPlanTrainer.tsx";
+import TrainerDetailScreen from "./src/screens/TrainerDetail.tsx";
+import TrainerDetailsScreen from "./src/screens/TrainerDetailsScreen.tsx";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -79,9 +81,9 @@ function MainTabs() {
         tabBarStyle: { backgroundColor: COLORS.gray800, borderTopWidth: 0 },
       })}
     >
-      <Tab.Screen name="Home" children={() => <NotchSafeView><ClientHome /></NotchSafeView>} />
       <Tab.Screen name="Gyms" children={() => <NotchSafeView><GymsScreen /></NotchSafeView>} />
       <Tab.Screen name="Trainers" children={() => <NotchSafeView><TrainerSearchScreen /></NotchSafeView>} />
+      <Tab.Screen name="Home" children={() => <NotchSafeView><ClientHome /></NotchSafeView>} />
       <Tab.Screen name="Bookings" children={() => <NotchSafeView><BookingsScreen /></NotchSafeView>} />
       <Tab.Screen name="Profile" children={() => <NotchSafeView><ProfileTabWrapper /></NotchSafeView>} />
     </Tab.Navigator>
@@ -140,10 +142,11 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SplashScreen" children={() => <NotchSafeView><SplashScreen /></NotchSafeView>} />
+      <Stack.Screen name="TrainerDetailScreen" children={() => <NotchSafeView><TrainerDetailScreen /></NotchSafeView>} />
       <Stack.Screen name="StepScreen" children={() => <NotchSafeView><StepScreen /></NotchSafeView>} />
       <Stack.Screen name="gymDetail" children={() => <NotchSafeView><GymDetailsScreen /></NotchSafeView>} />
       <Stack.Screen name="planDetail" children={() => <NotchSafeView><PlanDetailsScreen /></NotchSafeView>} />
-      <Stack.Screen name="trainerDetail" children={() => <NotchSafeView><TrainerProfileScreen /></NotchSafeView>} />
+      {/* <Stack.Screen name="trainerDetail" children={() => <NotchSafeView><TrainerProfileScreen /></NotchSafeView>} /> */}
       <Stack.Screen name="trainerBooking" children={() => <NotchSafeView><TrainerBookingScreen /></NotchSafeView>} />
       <Stack.Screen name="addPlanTrainer" children={() => <NotchSafeView><AddPlanScreen /></NotchSafeView>} />
       <Stack.Screen name="AuthScreen" component={AuthScreen} />

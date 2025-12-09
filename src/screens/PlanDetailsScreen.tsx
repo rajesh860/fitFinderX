@@ -10,8 +10,8 @@ import { COLORS } from '../theme/colors'; // Agar aap COLORS define kar rahe ho
 const PlanDetailsScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { planId } = route.params as { planId: string };
-
+    const { planId,isExpired } = route.params as { planId: string,isExpired:string };
+console.log(isExpired,"isExpired")
     // Fetch plan detail from API
     const { data, isLoading, isError } = usePlanDetailQuery(planId);
     if (isLoading) return (
@@ -39,7 +39,7 @@ const PlanDetailsScreen = () => {
         <View style={styles.container}>
             <GymDetailsHeader navigation={navigation} title="Gym Plan Detail" like={false} />
             <ScrollView contentContainerStyle={styles.scroll}>
-                <PlanCard plan={plan} active={"Active"}/>
+                <PlanCard plan={plan} active={isExpired}/>
             </ScrollView>
         </View>
     );

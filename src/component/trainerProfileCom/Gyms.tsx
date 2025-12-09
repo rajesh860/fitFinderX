@@ -4,25 +4,40 @@ import { Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../theme/colors';
 
-const Gyms = ({ refetch }) => {
+const Gyms = ({ gyms = [] }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>ASSOCIATED GYMS</Text>
-      <View style={styles.gymCard}>
-        <Icon name="dumbbell" size={20} color={COLORS.primary} />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={styles.gymName}>FitLife Gym Downtown</Text>
-          <Text style={styles.gymSub}>Premium Location</Text>
-        </View>
-      </View>
-      <View style={styles.gymCard}>
-        <Icon name="home-group" size={20} color={COLORS.success} />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={styles.gymName}>PowerHouse Fitness</Text>
-          <Text style={styles.gymSub}>Strength Training Hub</Text>
-        </View>
-      </View>
-      {/* If parent passed refetch, we don't call it here by default. Use in parent when needed. */}
+
+      {gyms.length > 0 ? (
+        gyms.map((gym, index) => (
+          <View key={gym._id || index} style={styles.gymCard}>
+            <Icon
+              name={index % 2 === 0 ? 'dumbbell' : 'home-group'}
+              size={22}
+              color={COLORS.primary}
+            />
+            <View style={{ marginLeft: 10, flex: 1 }}>
+              <Text style={styles.gymName}>
+                {gym.gymName || 'Unnamed Gym'}
+              </Text>
+
+              {gym.location?.coordinates ? (
+                <Text style={styles.gymSub}>
+                  📍 Lat: {gym.location.coordinates[1]?.toFixed(4)} | Lng:{' '}
+                  {gym.location.coordinates[0]?.toFixed(4)}
+                </Text>
+              ) : (
+                <Text style={styles.gymSub}>
+                  {gym.locationText || 'No location info'}
+                </Text>
+              )}
+            </View>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.emptyText}>No associated gyms found</Text>
+      )}
     </View>
   );
 };
@@ -50,10 +65,18 @@ const styles = StyleSheet.create({
   gymName: {
     color: COLORS.textPrimary,
     fontSize: 14,
+    fontWeight: '600',
   },
   gymSub: {
     color: COLORS.textSecondary,
     fontSize: 12,
+    marginTop: 2,
+  },
+  emptyText: {
+    color: COLORS.textMuted,
+    fontSize: 13,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 
