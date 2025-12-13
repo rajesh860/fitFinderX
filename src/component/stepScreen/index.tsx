@@ -113,12 +113,12 @@ const StepScreens = () => {
               labelStyle={{ color: COLORS.textPrimary }}
               onPress={() => navigation.navigate("AuthScreen")}
             >
-              Continue as User
+              Login
             </Button>
           </View>
 
           {/* Gym Owner Card */}
-          <View style={styles.card}>
+          {/* <View style={styles.card}>
             <View style={styles.cardCircle}>
               <Icon name="city-variant-outline" size={36} color={COLORS.primary} />
             </View>
@@ -132,7 +132,7 @@ const StepScreens = () => {
             >
               Continue as Gym Owner
             </Button>
-          </View>
+          </View> */}
         </View>
       </PagerView>
 

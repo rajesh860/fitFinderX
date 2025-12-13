@@ -1,27 +1,27 @@
 export const COLORS = {
-    // 🌙 Dark Backgrounds
-    background: "#0D0D0D", // Main app background
-    card: "#1A1A1A", // Card surfaces
-    overlay: "rgba(0,0,0,0.5)", // For transparent layers
+    // 🌙 Dark Backgrounds - Matching example dark theme
+    background: "#1A1A1A", // Main app background (dark gray like example)
+    card: "#2A2A2A", // Card surfaces (slightly lighter gray)
+    overlay: "rgba(0,0,0,0.7)", // For transparent layers
 
-    // 🧡 Brand / Accent
-    primary: "#FF8C32", // Orange accent
-    primaryLight: "#FFA552",
-    primaryDark: "#CC6E24",
-    primaryGray: "rgba(0,0,0,0.8)", // Dark gray variant for contrast
+    // 🧡 Brand / Accent - Vibrant orange from example
+    primary: "#FF6B35", // Vibrant orange accent (matching example)
+    primaryLight: "#FF8C5A",
+    primaryDark: "#E55A2B",
+    primaryGray: "rgba(26,26,26,0.9)", // Dark gray variant for contrast
 
     // ⚫ Grays & Neutrals
-    gray100: "#F5F5F5",
+    gray100: "#FFFFFF",
     gray200: "#E0E0E0",
-    gray300: "#BDBDBD",
-    gray400: "#9E9E9E",
-    gray500: "#757575",
-    gray600: "#555555",
+    gray300: "#B3B3B3",
+    gray400: "#808080",
+    gray500: "#666666",
+    gray600: "#4A4A4A",
     gray700: "#333333",
-    gray800: "#1F1F1F",
-    gray900: "#141414",
+    gray800: "#2A2A2A",
+    gray900: "#1A1A1A",
 
-    // 🧠 Text Colors
+    // 🧠 Text Colors - White primary, gray secondary
     textPrimary: "#FFFFFF",
     textSecondary: "#B3B3B3",
     textMuted: "#808080",
@@ -42,7 +42,7 @@ export const COLORS = {
     goldDark: "#B8860B",
 
     // 🧭 Borders
-    border: "#2A2A2A",
+    border: "#3A3A3A",
 
     // 🔘 Buttons
     buttonText: "#FFFFFF",

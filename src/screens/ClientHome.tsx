@@ -52,8 +52,8 @@ console.log(data,"yserhjk")
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator animating={true} size="large" color="#ff914d" />
-        <Text style={{ color: "#fff", marginTop: 10 }}>
+        <ActivityIndicator animating={true} size="large" color={COLORS.primary} />
+        <Text style={{ color: COLORS.textPrimary, marginTop: 10, fontSize: 16 }}>
           Loading your dashboard...
         </Text>
       </View>
@@ -64,7 +64,7 @@ console.log(data,"yserhjk")
   if (isError || !data?.data) {
     return (
       <View style={styles.center}>
-        <Text style={{ color: "#fff" }}>Failed to load dashboard</Text>
+        <Text style={{ color: COLORS.textPrimary, fontSize: 16 }}>Failed to load dashboard</Text>
       </View>
     );
   }
@@ -104,9 +104,9 @@ console.log(data,"yserhjk")
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#ff914d"
-            colors={["#ff914d"]}
-            progressBackgroundColor="#1e293b"
+            tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
+            progressBackgroundColor={COLORS.card}
           />
         }
       >
@@ -151,12 +151,12 @@ console.log(data,"yserhjk")
 export default ClientHome;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0f1720" },
-  content: { padding: 10 },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  content: { padding: 16, paddingBottom: 20 },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#0f1720",
+    backgroundColor: COLORS.background,
   },
 });

@@ -31,13 +31,13 @@ const PlanCard = ({ plan }) => {
           <View
             style={[
               styles.planChip,
-              { backgroundColor: isExpired ? "#b3261e" : "#0f2b33" },
+              { backgroundColor: isExpired ? COLORS.error + "30" : COLORS.primary + "20", borderWidth: 1, borderColor: isExpired ? COLORS.error : COLORS.primary },
             ]}
           >
             <Text
               style={[
                 styles.planChipText,
-                { color: isExpired ? "#fff" : "#9fb2b6" },
+                { color: isExpired ? COLORS.error : COLORS.primary },
               ]}
             >
               {isExpired ? "Expired" : `${plan.daysLeft} Days Left`}
@@ -64,13 +64,13 @@ const PlanCard = ({ plan }) => {
         <View
           style={[
             styles.statusContainer,
-            { backgroundColor: isExpired ? "#2a0e0e" : "#0f2b33" },
+            { backgroundColor: isExpired ? COLORS.error + "20" : COLORS.success + "20", borderColor: isExpired ? COLORS.error : COLORS.success },
           ]}
         >
           <Text
             style={[
               styles.statusText,
-              { color: isExpired ? "#ff6b6b" : "#6fe2e0" },
+              { color: isExpired ? COLORS.error : COLORS.success },
             ]}
           >
             {isExpired ? "❌ Membership Expired" : "✅ Active Membership"}
@@ -86,7 +86,7 @@ const PlanCard = ({ plan }) => {
             }
             uppercase={false}
             style={styles.outlineBtn}
-            labelStyle={{ color: "#cfeff0" }}
+            labelStyle={{ color: COLORS.primary, fontWeight: "600" }}
           >
             View Plan Details
           </Button>
@@ -98,11 +98,11 @@ const PlanCard = ({ plan }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#0f1b22",
-    borderRadius: 14,
-    marginBottom: 14,
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#12272c",
+    borderColor: COLORS.border,
     paddingVertical: 4,
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  cardTitle: { color: "#cfeff0", fontSize: 15, fontWeight: "700" },
+  cardTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: "700" },
   planChip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -121,50 +121,51 @@ const styles = StyleSheet.create({
   },
   planChipText: { fontSize: 12, fontWeight: "600" },
   planName: {
-    color: "#6fe2e0",
-    fontSize: 18,
+    color: COLORS.primary,
+    fontSize: 20,
     fontWeight: "700",
-    marginTop: 8,
+    marginTop: 10,
     textTransform: "capitalize",
   },
   dateContainer: {
-    marginTop: 12,
-    backgroundColor: "#0b1419",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    marginTop: 14,
+    backgroundColor: COLORS.gray700,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: "#1d343a",
+    borderColor: COLORS.border,
   },
   dateRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 3,
+    marginVertical: 4,
   },
   dateLabel: {
-    color: "#9fb2b6",
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: "500",
   },
   dateValue: {
-    color: "#cfeff0",
+    color: COLORS.textPrimary,
     fontSize: 13,
     fontWeight: "600",
   },
   statusContainer: {
     marginTop: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: 12,
+    borderRadius: 12,
     alignItems: "center",
+    borderWidth: 1,
   },
   statusText: {
     fontSize: 14,
     fontWeight: "600",
   },
   outlineBtn: {
-    borderColor: "#28454a",
-    borderWidth: 1,
-    borderRadius: 10,
+    borderColor: COLORS.primary,
+    borderWidth: 1.5,
+    borderRadius: 12,
     paddingVertical: 2,
   },
 });

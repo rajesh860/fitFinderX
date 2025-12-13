@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { StyleSheet, View, Animated } from "react-native";
 import { Card, Text } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { COLORS } from "../../theme/colors";
 
 const QuoteCard = ({ text }) => {
   const borderAnim = useRef(new Animated.Value(0)).current;
@@ -26,7 +27,7 @@ const QuoteCard = ({ text }) => {
   // border color pulse between 2 shades
   const animatedBorderColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#1e3a3a", "#2afadf"], // change colors if you like
+    outputRange: [COLORS.primaryDark, COLORS.primary],
   });
 
   return (
@@ -34,7 +35,9 @@ const QuoteCard = ({ text }) => {
       <Card style={styles.innerCard}>
         <Card.Content>
           <View style={styles.quoteBox}>
-            <Icon name="flash" size={18} color="#FFD166" />
+            <View style={styles.iconContainer}>
+              <Icon name="flash" size={20} color={COLORS.primary} />
+            </View>
             <Text style={styles.quoteText}>{text}</Text>
           </View>
         </Card.Content>
@@ -47,28 +50,31 @@ export default QuoteCard;
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 12,
-    marginBottom: 12,
+    borderRadius: 16,
+    marginBottom: 16,
     overflow: "hidden",
-    borderWidth: 1.5,
+    borderWidth: 2,
   },
   innerCard: {
-    backgroundColor: "#081018",
-    borderRadius: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
     overflow: "hidden",
   },
   quoteBox: {
-    backgroundColor: "#081018",
-    borderRadius: 10,
-    padding: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    flexWrap: "wrap",
+  },
+  iconContainer: {
+    backgroundColor: COLORS.gray700,
+    padding: 8,
+    borderRadius: 10,
   },
   quoteText: {
-    color: "#fff",
+    color: COLORS.textPrimary,
     fontSize: 15,
-    width: "85%",
+    fontWeight: "500",
+    flex: 1,
+    lineHeight: 22,
   },
 });

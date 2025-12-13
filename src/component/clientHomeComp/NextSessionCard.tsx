@@ -52,33 +52,59 @@ const CurrentGymCard = ({ gym, expired, onRenew }) => {
 
 const styles = StyleSheet.create({
   card: {
-   backgroundColor: "#0f1b22",
+   backgroundColor: COLORS.card,
    borderWidth: 1,
-   borderColor: "#12272c",
-    borderRadius: 12,
+   borderColor: COLORS.border,
+    borderRadius: 16,
     padding: 16,
     marginTop: 10,
-    marginBottom:10,
-    
+    marginBottom: 10,
   },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
+  header: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 8,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
   title: {
     color: COLORS.textPrimary,
-    fontWeight: "600",
-    fontSize: 16,
-    marginLeft: 8,
+    fontWeight: "700",
+    fontSize: 18,
+    marginLeft: 10,
   },
-  subText: { color: COLORS.textSecondary, fontSize: 14, marginBottom: 8 },
-  status: { fontSize: 14, fontWeight: "500" },
+  subText: { 
+    color: COLORS.textSecondary, 
+    fontSize: 14, 
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  status: { 
+    fontSize: 14, 
+    fontWeight: "600",
+    marginTop: 4,
+  },
   renewBtn: {
     backgroundColor: COLORS.primary,
-    marginTop: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 12,
     alignItems: "center",
   },
-  renewText: { color: COLORS.textPrimary, fontWeight: "600", fontSize: 15 },
-  rating: { color: "#ccc", fontSize: 13, marginTop: 8 },
+  renewText: { 
+    color: COLORS.textPrimary, 
+    fontWeight: "600", 
+    fontSize: 15,
+  },
+  rating: { 
+    color: COLORS.textSecondary, 
+    fontSize: 13, 
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
 });
 
 export default CurrentGymCard;
